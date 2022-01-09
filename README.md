@@ -9,7 +9,7 @@ Simple web app - browser based game created with HTML, CSS, Python, Node.js and 
 * [Files](#files)
 * [Setup](#setup)
 
-#### Video Demo  <URL: HERE>
+#### Video Demo  <URL: https://youtu.be/RBGItvYAfps>
 
 #### Description
 This is a final project for Harvard's CS50 course. My goal was to use new learned technologies, memorize the material from course and have fun while doing it.
