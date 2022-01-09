@@ -1,0 +1,87 @@
+{% extends "layout.html" %}
+
+{% block title %}
+My account
+{% endblock%}
+
+{% block main %}
+
+<div class="container text-center my-2">
+    <h1> Your TOP 10 scores:</h1>
+</div>
+<div class="row justify-content-center text-center">
+    <div class="col-9">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Score</th>
+                    <th>Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for score in your_score %}
+                <tr>
+                    <td> {{ loop.index }} </td>
+                    <td> {{ score.score }} </td>
+                    <td> {{ score.timestamp }} </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!--The photos we like-->
+<div class="conteiner text-center my-2">
+    <h1> Your liked photos:</h1>
+</div>
+
+<div class="conteiner" id="like_card_conteiner">
+    <div class="row">
+        {% for photo in your_photos %}
+        <div class="col-12 col-sm-6 col-md-3">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <div class="card_fixed_hight">
+                        <img class="card-img-top liked_card" id="picture{{ loop.index }}" src="{{ photo.image }}" alt="Pictures used in game" class="image-fluid">
+                    </div>
+                    <div class="h-30">
+                        <p class="card-text"><i class="bi bi-camera"></i> Author:</p>
+                        <p class="card-text" id="author{{ loop.index }}">{{ photo.author }}</p>                       
+                        <a href="{{ photo.url }}" id="link{{ loop.index }}" target="_blank"><p><i class="bi bi-link"></i>Link</p></a>                        
+                        <p class="card-text" id="like{{ loop.index }}" style="cursor: pointer" onclick="delete_photo(event)"><i class="bi bi-x-circle"></i> Delete from liked photos</p>                        
+                    </div>      
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<script>
+function delete_photo(event) {
+    /* Get button and its id */
+    let button = event.srcElement;
+    let id = button.id;
+    id = id[4];
+
+    /* Get username */
+    let username = '{{ username }}'
+    let url = document.getElementById(`picture${id}`).src
+
+    /* Post reqest to db */
+    $.post("/deletephoto", {
+        js_data: `{"image" : "${url}", "username" : "${username}"}`
+    }); 
+    
+    /* Refresh the page */
+    setTimeout( function() {
+        location.reload();
+    }, 500);    
+}
+        
+</script>
+
+
+{% endblock %}

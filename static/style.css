@@ -1,0 +1,165 @@
+/**Google fonts**/
+@import url('https://fonts.googleapis.com/css2?family=Big+Shoulders+Inline+Text:wght@800&family=Dosis&family=Faster+One&family=Monoton&display=swap');
+
+/*Theme colors**/
+:root {
+    --arctic_lime: #E0FF4F;
+    --blue_munsell: #048BA8;
+    --razzle_dazzle_rose: #FF2ECC;
+    --midnight: #74226C;
+    --light_steel_blue: #AEC5EB;
+    --pine_tree: #232E21;
+    /*match no match colors*/
+    --imperial_red: #F71735;
+    --olive_drab: #60992D;
+}
+
+/*Fonsts classes*/
+.logo_font {
+    font-family: 'Monoton', cursive;
+}
+
+.score_font {
+    font-family: 'Faster One', cursive;
+    font-size: 40px;
+}
+
+.header_font {
+    font-family: 'Big Shoulders Inline Text', cursive;
+    font-size: 40px;
+}
+
+.text_font {
+    font-family: 'Dosis', sans-serif;
+    font-size: 25px;
+}
+
+.text_footer {
+    font-family: 'Dosis', sans-serif;
+    font-size: 15px;
+}
+
+/*Basic fonts*/
+
+p {
+    text-align: center;
+    font-family: 'Dosis', sans-serif;
+
+}
+
+h1 {
+    text-align: center;
+    font-family: 'Big Shoulders Inline Text', cursive;
+}
+
+/*Bacgroudns*/
+
+nav {
+    background-color: var(--midnight);
+}
+
+body {
+    background-color: var(--midnight);
+}
+
+main {
+    background-color: var(--blue_munsell);
+    background-image: url("../static/background.jpeg");
+
+}
+
+footer {
+    background-color: var(--olive_drab);
+}
+
+.btn_yellow {
+    background-color: var(--arctic_lime);
+    font-family: 'Big Shoulders Inline Text', cursive;
+    border-radius: 5px 25px;
+    font-size: 30px;
+}
+
+/*Other css*/
+
+/*Medium screen*/
+.card_frame {
+    width: 15vw;
+    height: 15vw;
+    border-radius: 5px 15px;
+    border: solid 4px var(--midnight);    
+    overflow: hidden;
+    justify-content: center;
+    align-items: center;
+    transition: box-shadow 1s;
+}
+
+/*Big screen*/
+@media (min-width: 768px) {
+    .card_frame {
+        width: 8vw;
+        height: 8vw;
+    }
+}
+
+/*Small screen*/
+@media (max-width: 576px) {
+    .card_frame {
+        width: 30vw;
+        height: 30vw;
+    }
+}
+
+.card_frame:hover {
+    box-shadow: 0px 0px 40px 20px var(--light_steel_blue); 
+}
+
+
+.card_back {
+    object-fit: cover;
+    height: 100%;
+    width: 100%;
+}
+
+.game_over {
+    margin: auto;
+    display: none;
+    z-index: 1;
+    position: relative;
+}
+
+.hidden_cards_conteiner {
+    display: none;
+}
+
+.card_fixed_hight {
+    height: 200px;
+}
+
+.liked_card {
+    object-fit: cover;
+    height: 100%;
+    width: 100%;
+}
+
+.pexel_footer {
+    height: 30px; 
+}
+
+/*To delete*/
+.card_text {
+    font-family: 'Monoton', cursive;
+    font-size: 50px;
+    transform: rotate(45deg);
+    display: inline;
+    color: var(--midnight);
+}
+
+.card_conteiner {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow:hidden;
+    width: 1000px;
+    height: 1000px;
+    background-color: var(--arctic_lime);
+}
