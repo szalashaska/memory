@@ -14,6 +14,16 @@ from helpers import get_images, login_required, sorry, get_username
 # Configure app
 app = Flask(__name__)
 
+ENV = "dev"
+
+if ENV == "dev":
+    # ...//username:password@localhost...
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:postgres@localhost/memory'
+
+else:
+    app.debug = False
+    app.config['SQLALCHEMY_DATABASE_URI'] = ''
+
 # Configure session to use filesystem (instead of signed cookies)
 app.config["SESSION_FILE_DIR"] = mkdtemp()
 app.config["SESSION_PERMANENT"] = False
