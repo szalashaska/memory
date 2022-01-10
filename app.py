@@ -1,8 +1,8 @@
 import os
-import sqlite3
 
 from flask import Flask, request, render_template, session, redirect, jsonify, json
 from flask_session import Session
+from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import check_password_hash, generate_password_hash
 from tempfile import mkdtemp
 from string import punctuation
