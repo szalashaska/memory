@@ -7,6 +7,7 @@ from werkzeug.security import check_password_hash, generate_password_hash
 from tempfile import mkdtemp
 from string import punctuation
 from random import shuffle, randint
+from datetime import datetime
 
 from helpers import get_images, login_required, sorry, get_username
 
@@ -14,7 +15,11 @@ from helpers import get_images, login_required, sorry, get_username
 # Configure app
 app = Flask(__name__)
 
+# Choose between development and production: "dev" or "porduktion"
 ENV = "dev"
+
+# Choose between Postgres and Sqlite: "postgres" or "sqlite" 
+DB_TYPE = "postgres"
 
 if ENV == "dev":
     # ...//username:password@localhost...
@@ -23,6 +28,49 @@ if ENV == "dev":
 else:
     app.debug = False
     app.config['SQLALCHEMY_DATABASE_URI'] = ''
+
+''' When useing Postgres DB '''
+# Switching of modification tracking and setting up the DB
+if DB_TYPE == "postgres":
+    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+    db = SQLAlchemy(app)
+
+    # Creating DB model: table users, scores and images
+    class Users(db.Model):
+        __tablename__ = 'users'
+        id = db.Column(db.Integer, primary_key=True)
+        user = db.Column(db.String(50), unique=True)
+        hash = db.Column(db.String(200))
+        scores = db.relationship('Scores', backref='users')
+        images = db.relationship('Images', backref='users')
+
+        def __init__(self, id, user, hash):
+            self.user = user
+            self.hash = hash
+
+    class Scores(db.Model):
+        __tablename__ = 'scores'
+        scores_id = db.Column(db.Integer, primary_key=True)
+        user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+        score = db.Column(db.Integer)
+        timestamp = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+
+        def __init__(self, user_id, score, timestamp):
+            self.user_id = user_id
+            self.score = score
+            self.timestamp = timestamp
+
+    class Images(db.Model):
+        __tablename__ = 'images'
+        images_id = db.Column(db.Integer, primary_key=True)
+        user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+        image = db.Column(db.String(200), nullable=False)
+
+        def __init__(self, user_id, image):
+            self.user_id = user_id
+            self.image = image
+
+''' End of Postgres configuration '''
 
 # Configure session to use filesystem (instead of signed cookies)
 app.config["SESSION_FILE_DIR"] = mkdtemp()
