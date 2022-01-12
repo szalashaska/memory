@@ -26,6 +26,9 @@ else:
 # Configure app
 app = Flask(__name__)
 
+app.secret_key = "!?%Memory^&*by#^&*Kamil*^$Petryniak"
+
+# Alternative session settings for local filesytem
 '''
 # Configure session to use filesystem (instead of signed cookies)
 app.config["SESSION_FILE_DIR"] = mkdtemp()
@@ -232,33 +235,60 @@ def login():
         elif not password:
             return sorry("Password is missing", 403)
 
-        # Initialize db, use row_factory to access data like in dict (still need to iterate over it)
-        memory = sqlite3.connect("memory.db")
-        memory.row_factory = sqlite3.Row
-        db = memory.cursor()
-         
-        # Ensure username does not already exists ( fetchall(), instead of rows - db.execute, idk why it interfers with password check...)
-        if len(db.execute("SELECT * FROM users WHERE username = ?", [username]).fetchall()) != 1:
-            return sorry("Username does not exist", 403)
+        # If we use Postgres    
+        if DB_TYPE == "postgres":
 
-        # Check username in database (single input with [])
-        rows = db.execute("SELECT * FROM users WHERE username = ?", [username])
+            # Initialize db
+            db = SQLAlchemy(app)
 
-        # Iterate over query (row_factory), get password and id
-        hash_pass, userid = "",""
-        for row in rows:
-            hash_pass = row["hash"]
-            userid = row["id"]
+            # Check if user exists
+            if db.session.query(Users).filter(Users.user == username).count() != 1:
+                return sorry("Username does not exist", 403)
+
+            # Query for user in db, get id and password hash
+            user = db.session.query(Users).filter(Users.user == username).first()
             
-        # Compere password and hash
-        if not check_password_hash(hash_pass, password):
-            return sorry("Wrong password")
-             
-        # Remember the user
-        session["user_id"] = userid
-        
-        return redirect("/")
-        memory.close()
+            hash_pass = user.hash
+            userid = user.id
+
+            # Check if password is correct
+            if not check_password_hash(hash_pass, password):
+                return sorry("Wrong password")
+
+            # Remember the user
+            session["user_id"] = userid
+            
+            return redirect("/")
+
+        # If we use Sqlite
+        else:
+            # Initialize db, use row_factory to access data like in dict (still need to iterate over it)
+            memory = sqlite3.connect("memory.db")
+            memory.row_factory = sqlite3.Row
+            db = memory.cursor()
+            
+            # Ensure username exists ( fetchall(), instead of rows - db.execute, idk why it interfers with password check...)
+            if len(db.execute("SELECT * FROM users WHERE username = ?", [username]).fetchall()) != 1:
+                return sorry("Username does not exist", 403)
+
+            # Check username in database (single input with [])
+            rows = db.execute("SELECT * FROM users WHERE username = ?", [username])
+
+            # Iterate over query (row_factory), get password and id
+            hash_pass, userid = "",""
+            for row in rows:
+                hash_pass = row["hash"]
+                userid = row["id"]
+                
+            # Compere password and hash
+            if not check_password_hash(hash_pass, password):
+                return sorry("Wrong password")
+                
+            # Remember the user
+            session["user_id"] = userid
+            
+            return redirect("/")
+            memory.close()
     
     else:
         return render_template("login.html")
@@ -293,7 +323,7 @@ def register():
         if not special_char_check:
             return sorry("Password must contain at lest one special character", 403) 
 
-        #If we use Postgres    
+        # If we use Postgres    
         if DB_TYPE == "postgres":
             db = SQLAlchemy(app)
             # Ensure username does not already exists
@@ -312,7 +342,7 @@ def register():
                 # Return apology if username was alredy taken
                 return sorry("Username already taken")     
         
-        # If we use sqlite database
+        # If we use Sqlite
         else:
             # Initialize db
             memory = sqlite3.connect("memory.db")
