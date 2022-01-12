@@ -73,12 +73,11 @@ if DB_TYPE == "postgres":
         scores_id = db.Column(db.Integer, primary_key=True)
         user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
         score = db.Column(db.Integer)
-        timestamp = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+        timestamp = db.Column(db.DateTime, default=datetime.now, nullable=False)
 
-        def __init__(self, user_id, score, timestamp):
+        def __init__(self, user_id, score):
             self.user_id = user_id
             self.score = score
-            self.timestamp = timestamp
 
     class Images(db.Model):
         __tablename__ = 'images'
@@ -115,18 +114,37 @@ def getscores():
     score = data["score"]
     username = data["username"]
 
-    # Open db and writes into it
-    memory = sqlite3.connect("memory.db")
-    db = memory.cursor()
-    db.execute("""INSERT INTO scores (score, user_id, timestamp) VALUES (?, (SELECT id FROM users WHERE username = ?), 
-               datetime(CURRENT_TIMESTAMP, 'localtime'));""", (score, username))
+    # If we use Postgres
+    if DB_TYPE == "postgres":
+        # Initialize db
+        db = SQLAlchemy(app)
 
-    # Save input and close it
-    memory.commit()
-    memory.close()
-    
-    # Return js data in order to avoid error ...
-    return jsdata
+        # Get user id
+        user = db.session.query(Users).filter(Users.user == username).first()
+        
+        # Prepare data
+        data = Scores(user.id, score)
+
+        # Add and commit data to db
+        db.session.add(data)
+        db.session.commit()
+        
+        return jsdata
+
+    # If we use Sqlite
+    else:
+        # Open db and writes into it
+        memory = sqlite3.connect("memory.db")
+        db = memory.cursor()
+        db.execute("""INSERT INTO scores (score, user_id, timestamp) VALUES (?, (SELECT id FROM users WHERE username = ?), 
+                datetime(CURRENT_TIMESTAMP, 'localtime'));""", (score, username))
+
+        # Save input and close it
+        memory.commit()
+        memory.close()
+        
+        # Return js data in order to avoid error ...
+        return jsdata
 
 
 @app.route("/deletephoto", methods=["POST"])
