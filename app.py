@@ -2,7 +2,6 @@ import os
 
 from flask import Flask, request, render_template, session, redirect, jsonify, json
 from flask_session import Session
-from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import check_password_hash, generate_password_hash
 from tempfile import mkdtemp
 from string import punctuation
@@ -11,30 +10,48 @@ from datetime import datetime
 
 from helpers import get_images, login_required, sorry, get_username
 
+# Choose between Postgres and Sqlite: "postgres" or "sqlite" 
+DB_TYPE = "postgres"
+
+# Choose between development and production: "dev" or "porduction"
+ENV = "dev"
+
+# Import Datbase modul
+if DB_TYPE == "postgres":
+    from flask_sqlalchemy import SQLAlchemy
+else:
+    import sqlite3
+
 
 # Configure app
 app = Flask(__name__)
 
-# Choose between development and production: "dev" or "porduktion"
-ENV = "dev"
+'''
+# Configure session to use filesystem (instead of signed cookies)
+app.config["SESSION_FILE_DIR"] = mkdtemp()
+app.config["SESSION_PERMANENT"] = False
+app.config["SESSION_TYPE"] = "filesystem"
+Session(app)
+'''
 
-# Choose between Postgres and Sqlite: "postgres" or "sqlite" 
-DB_TYPE = "postgres"
+# Ensure templates are auto-reloaded
+app.config["TEMPLATES_AUTO_RELOAD"] = True
 
-if ENV == "dev":
-    # ...//username:password@localhost...
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:postgres@localhost/memory'
-
-else:
-    app.debug = False
-    app.config['SQLALCHEMY_DATABASE_URI'] = ''
-
-''' When useing Postgres DB '''
-# Switching of modification tracking and setting up the DB
+''' When using Postgres DB '''
 if DB_TYPE == "postgres":
-    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-    db = SQLAlchemy(app)
+    if ENV == "dev":
+        # ...//username:password@localhost...
+        app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:postgres@localhost/memory'
 
+    else:
+        app.debug = False
+        app.config['SQLALCHEMY_DATABASE_URI'] = ''
+
+    # Switching of modification tracking and setting up the DB
+    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+    
+    db = SQLAlchemy(app)
+    
     # Creating DB model: table users, scores and images
     class Users(db.Model):
         __tablename__ = 'users'
@@ -44,7 +61,7 @@ if DB_TYPE == "postgres":
         scores = db.relationship('Scores', backref='users')
         images = db.relationship('Images', backref='users')
 
-        def __init__(self, id, user, hash):
+        def __init__(self, user, hash):
             self.user = user
             self.hash = hash
 
@@ -71,16 +88,6 @@ if DB_TYPE == "postgres":
             self.image = image
 
 ''' End of Postgres configuration '''
-
-# Configure session to use filesystem (instead of signed cookies)
-app.config["SESSION_FILE_DIR"] = mkdtemp()
-app.config["SESSION_PERMANENT"] = False
-app.config["SESSION_TYPE"] = "filesystem"
-Session(app)
-
-# Ensure templates are auto-reloaded
-app.config["TEMPLATES_AUTO_RELOAD"] = True
-
 
 @app.route("/")
 def index():
@@ -284,32 +291,53 @@ def register():
             if word in special_char:
                 special_char_check = True
         if not special_char_check:
-            return sorry("Password must contain at lest one special character", 403)      
+            return sorry("Password must contain at lest one special character", 403) 
+
+        #If we use Postgres    
+        if DB_TYPE == "postgres":
+            db = SQLAlchemy(app)
+            # Ensure username does not already exists
+            if db.session.query(Users).filter(Users.user == username).count() == 0:
+                # Hash password and insert user into db
+                hash_password = generate_password_hash(password, method='pbkdf2:sha256', salt_length=16)
+
+                data = Users(username, hash_password)
+                db.session.add(data)
+
+                # Commit/save changes and redirect to users account
+                db.session.commit()
+
+                return redirect("/login")
+            else:
+                # Return apology if username was alredy taken
+                return sorry("Username already taken")     
         
-        # Initialize db
-        memory = sqlite3.connect("memory.db")
-        db = memory.cursor()
-         
-        # Load username from database in rows (single input with [])
-        rows = db.execute("SELECT * FROM users WHERE username = ?", [username])
+        # If we use sqlite database
+        else:
+            # Initialize db
+            memory = sqlite3.connect("memory.db")
+            db = memory.cursor()
+            
+            # Load username from database in rows (single input with [])
+            rows = db.execute("SELECT * FROM users WHERE username = ?", [username])
 
-        # Ensure username does not already exists ( fetchall() )
-        if len(rows.fetchall()):
-            return sorry("Username already taken")
-        # Default color
-        color = "default"
+            # Ensure username does not already exists ( fetchall() )
+            if len(rows.fetchall()):
+                return sorry("Username already taken")
+            # Default color
+            color = "default"
 
-        # Hash password and insert user into db
-        hash_password = generate_password_hash(password, method='pbkdf2:sha256', salt_length=16)
-        db.execute("INSERT INTO users (username, hash, color) VALUES (?, ?, ?)", (username, hash_password, color))
+            # Hash password and insert user into db
+            hash_password = generate_password_hash(password, method='pbkdf2:sha256', salt_length=16)
+            db.execute("INSERT INTO users (username, hash, color) VALUES (?, ?, ?)", (username, hash_password, color))
 
-        # Commit/save changes and redirect to users account
-        memory.commit()
-        memory.close()
+            # Commit/save changes and redirect to users account
+            memory.commit()
+            memory.close()
 
-        return redirect("/login")
+            return redirect("/login")
         
-    else:
+    else:      
         return render_template("register.html")
 
 
@@ -421,3 +449,6 @@ def game():
 
     else:
         return redirect("/specify")
+
+if __name__ == '__main__':
+    app.run()
