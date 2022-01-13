@@ -13,7 +13,7 @@ from helpers import get_images, login_required, sorry, get_username
 # Choose between Postgres and Sqlite: "postgres" or "sqlite" 
 DB_TYPE = "postgres"
 
-# Choose between development and production: "dev" or "porduction"
+# Choose between development and production: "dev" or "prod"
 ENV = "dev"
 
 # Import Datbase modul
@@ -92,8 +92,10 @@ if DB_TYPE == "postgres":
             self.image = image
             self.url = url
             self.author = author
-
-''' End of Postgres configuration '''
+            ''' End of Postgres configuration '''
+else:
+# If we use Sqlite we do not need declare Username variable to avoid error
+    Users = ""
 
 @app.route("/")
 def index():
@@ -171,7 +173,7 @@ def deletephoto():
         photo = db.session.query(Images).filter(Images.image == image, Images.user_id == user.id).first()
         
         # Check if image exists and delete if so
-        if data:
+        if photo:
             db.session.delete(photo)
             db.session.commit()
 
@@ -264,7 +266,7 @@ def scores():
     if DB_TYPE == "postgres":
         db = SQLAlchemy(app)
         # with_entities creates one object, instead of to objects as default
-        # order of command my matter
+        # order of command may matter
         top_scores = db.session.query(Scores, Users).join(Users).with_entities(Scores.score, Users.username).order_by(Scores.score.desc()).limit(10).all()
     
     # If we use Sqlite
