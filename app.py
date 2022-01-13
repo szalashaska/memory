@@ -155,29 +155,43 @@ def getscores():
 def deletephoto():
     '''Deletes pictures from db'''
     # Data from js
-    js_data = request.form["js_data"]
+    jsdata = request.form["js_data"]
 
     # Convert data to python dict
-    data = json.loads(js_data)
+    data = json.loads(jsdata)
 
     image = data["image"]
     username = data["username"]
 
-    # Open db and execute queries
-    memory = sqlite3.connect("memory.db")
-    db = memory.cursor()
+    # If we use Postgres
+    if DB_TYPE == "postgres":
+        db = SQLAlchemy(app)
 
-    # Check if photo is already in db
-    rows = db.execute("""SELECT * FROM images WHERE user_id = (SELECT id FROM users WHERE username = ?) AND image = ?;""", (username, image))
-    if len(rows.fetchall()) == 0:
-        return jsdata
-   
-    # Delete the photo
-    db.execute("""DELETE FROM images WHERE user_id = (SELECT id FROM users WHERE username = ?) AND image = ?;""", (username, image))
+        user = db.session.query(Users).filter(Users.username == username).first()
+        photo = db.session.query(Images).filter(Images.image == image, Images.user_id == user.id).first()
+        
+        # Check if image exists and delete if so
+        if data:
+            db.session.delete(photo)
+            db.session.commit()
+
+    # If we use Sqlite
+    else:
+        # Open db and execute queries
+        memory = sqlite3.connect("memory.db")
+        db = memory.cursor()
+
+        # Check if photo is already db
+        rows = db.execute("""SELECT * FROM images WHERE user_id = (SELECT id FROM users WHERE username = ?) AND image = ?;""", (username, image))
+        if len(rows.fetchall()) == 0:
+            return jsdata
     
-    # Save input and close it
-    memory.commit()
-    memory.close()
+        # Delete the photo
+        db.execute("""DELETE FROM images WHERE user_id = (SELECT id FROM users WHERE username = ?) AND image = ?;""", (username, image))
+        
+        # Save input and close it
+        memory.commit()
+        memory.close()
     
     # Return js data in order to avoid error ...
     return jsdata
@@ -436,34 +450,44 @@ def logout():
 @app.route("/myaccount")
 @login_required
 def myaccount():
-    '''Render yousers account (his scores and favourite pictures)'''
+    '''Render users account (his scores and favourite pictures)'''
 
     # Get username, if logged in
     username = get_username(DB_TYPE, Users)
 
-    memory = sqlite3.connect("memory.db")
-    memory.row_factory = sqlite3.Row
-    db = memory.cursor()
+    #If we use Postgres
+    if DB_TYPE == "postgres":
+        db = SQLAlchemy(app)
 
-    # Get scores from db
-    your_score = db.execute(""" SELECT scores.score, scores.timestamp FROM scores JOIN users ON scores.user_id = users.id
-                            WHERE users.username = ? ORDER BY scores.score DESC LIMIT 10;""", [username])
-    
-    scores = []
-    for your in your_score:
-        scores.append({"timestamp" : your["timestamp"], "score" : your["score"]})
+        # Get scores 
+        scores = db.session.query(Scores, Users).join(Users).where(Users.username == username).with_entities(Scores.score, Scores.timestamp).order_by(Scores.score.desc()).limit(10).all()
 
-    # Get photos info from db
-    your_photos = db.execute(""" SELECT images.image, images.url, images.author FROM images JOIN users ON images.user_id = users.id
-                            WHERE users.username = ?;""", [username])
-    
-    photos = []
-    for photo in your_photos:
-        photos.append({"image" : photo["image"], "url" : photo["url"], "author" : photo["author"]})
+        # Get images
+        photos = db.session.query(Images, Users).join(Users).where(Users.username == username).with_entities(Images.image, Images.url, Images.author).all()
+
+    # If we use Sqlite
+    else:
+        memory = sqlite3.connect("memory.db")
+        memory.row_factory = sqlite3.Row
+        db = memory.cursor()
+
+        # Get scores from db
+        your_score = db.execute(""" SELECT scores.score, scores.timestamp FROM scores JOIN users ON scores.user_id = users.id
+                                WHERE users.username = ? ORDER BY scores.score DESC LIMIT 10;""", [username])
         
-    memory.close()
-      
-    # We dont close db (memory.close()), becasue webpage cant operate on closed db 
+        scores = []
+        for your in your_score:
+            scores.append({"timestamp" : your["timestamp"], "score" : your["score"]})
+
+        # Get photos info from db
+        your_photos = db.execute(""" SELECT images.image, images.url, images.author FROM images JOIN users ON images.user_id = users.id
+                                WHERE users.username = ?;""", [username])
+        
+        photos = []
+        for photo in your_photos:
+            photos.append({"image" : photo["image"], "url" : photo["url"], "author" : photo["author"]})
+            
+        memory.close()
 
     return render_template("myaccount.html", username=username, your_score=scores, your_photos=photos)
 
