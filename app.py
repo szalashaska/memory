@@ -14,13 +14,15 @@ from helpers import get_images, login_required, sorry, get_username
 DB_TYPE = "postgres"
 
 # Choose between development and production: "dev" or "prod"
-ENV = "dev"
+ENV = "prod"
 
 # Import Datbase modul
 if DB_TYPE == "postgres":
     from flask_sqlalchemy import SQLAlchemy
 else:
     import sqlite3
+    # If we use Sqlite we do not need declare Username variable to avoid error
+    Users = ""
 
 
 # Configure app
@@ -48,7 +50,7 @@ if DB_TYPE == "postgres":
 
     else:
         app.debug = False
-        app.config['SQLALCHEMY_DATABASE_URI'] = ''
+        app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres://wooehgymbagblq:426a594015c9df551403f765a42cb0bf281a8f2559b530c412db430764eb20fa@ec2-34-239-196-254.compute-1.amazonaws.com:5432/d3lqs3f5nmk6tg'
 
     # Switching of modification tracking and setting up the DB
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -93,9 +95,7 @@ if DB_TYPE == "postgres":
             self.url = url
             self.author = author
             ''' End of Postgres configuration '''
-else:
-# If we use Sqlite we do not need declare Username variable to avoid error
-    Users = ""
+
 
 @app.route("/")
 def index():
