@@ -1,7 +1,8 @@
 import os
 import sqlite3
 import requests
-from flask import redirect, request, json, render_template, session
+from flask import Flask, redirect, request, json, render_template, session
+from flask_sqlalchemy import SQLAlchemy
 from functools import wraps
 
 
@@ -50,17 +51,29 @@ def sorry(message, code=400):
     return render_template("sorry.html", message=message, error_code=code), code
 
 
-def get_username():
+def get_username(database, table):
     '''Returns username, if he is logged in'''
 
     username = "Stranger"
     if session.get("user_id") is not None:
-        memory = sqlite3.connect("memory.db")
-        memory.row_factory = sqlite3.Row
-        db = memory.cursor()
-        rows = db.execute("SELECT username FROM users WHERE id = ?", [session["user_id"]])
-              
-        for row in rows:
-            username = row["username"]
-        memory.close()
+        # If we use Postgres
+        if database == "postgres":
+            app = Flask(__name__)   
+            app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+            db = SQLAlchemy(app)         
+            user = db.session.query(table).filter(table.id == session["user_id"]).first()
+            username = user.user          
+
+        # If we use sqlite
+        if database == "sqlite":
+            memory = sqlite3.connect("memory.db")
+            memory.row_factory = sqlite3.Row
+            db = memory.cursor()
+            rows = db.execute("SELECT username FROM users WHERE id = ?", [session["user_id"]])
+                
+            for row in rows:
+                username = row["username"]
+            memory.close()
+            
     return username
+

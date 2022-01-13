@@ -96,7 +96,7 @@ def index():
     '''Renders Homepage'''
 
     # Get username, if logged in
-    username = get_username()
+    username = get_username(DB_TYPE, Users)
 
     return render_template("index.html", username=username)
 
@@ -220,7 +220,7 @@ def scores():
     ''' Reads scores from database and renders it '''
 
     # Get username, if logged in
-    username = get_username()
+    username = get_username(DB_TYPE, Users)
     
     # Initialize db
     memory = sqlite3.connect("memory.db")
@@ -406,7 +406,7 @@ def myaccount():
     '''Render yousers account (his scores and favourite pictures)'''
 
     # Get username, if logged in
-    username = get_username()
+    username = get_username(DB_TYPE, Users)
 
     memory = sqlite3.connect("memory.db")
     memory.row_factory = sqlite3.Row
@@ -440,7 +440,7 @@ def specify():
     '''Renders specify'''
 
     # Get username, if logged in
-    username = get_username()
+    username = get_username(DB_TYPE, Users)
 
     return render_template("specify.html", username=username)
 
@@ -450,7 +450,7 @@ def game():
     '''Creates game that user defined, gets photos form API'''
 
     # Get username, if logged in
-    username = get_username()
+    username = get_username(DB_TYPE, Users)
 
     if request.method == "POST":
         # Get users input
