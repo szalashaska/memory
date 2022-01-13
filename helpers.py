@@ -62,7 +62,7 @@ def get_username(database, table):
             app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
             db = SQLAlchemy(app)         
             user = db.session.query(table).filter(table.id == session["user_id"]).first()
-            username = user.user          
+            username = user.username          
 
         # If we use sqlite
         if database == "sqlite":

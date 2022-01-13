@@ -43,7 +43,7 @@ app.config["TEMPLATES_AUTO_RELOAD"] = True
 ''' When using Postgres DB '''
 if DB_TYPE == "postgres":
     if ENV == "dev":
-        # ...//username:password@localhost...
+        # ...//username:password@localhost/database_name
         app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:postgres@localhost/memory'
 
     else:
@@ -59,13 +59,13 @@ if DB_TYPE == "postgres":
     class Users(db.Model):
         __tablename__ = 'users'
         id = db.Column(db.Integer, primary_key=True)
-        user = db.Column(db.String(50), unique=True)
+        username = db.Column(db.String(50), unique=True)
         hash = db.Column(db.String(200))
         scores = db.relationship('Scores', backref='users')
         images = db.relationship('Images', backref='users')
 
-        def __init__(self, user, hash):
-            self.user = user
+        def __init__(self, username, hash):
+            self.username = username
             self.hash = hash
 
     class Scores(db.Model):
@@ -73,7 +73,7 @@ if DB_TYPE == "postgres":
         scores_id = db.Column(db.Integer, primary_key=True)
         user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
         score = db.Column(db.Integer)
-        timestamp = db.Column(db.DateTime, default=datetime.now, nullable=False)
+        timestamp = db.Column(db.DateTime, default=datetime.now().strftime("%x %X"), nullable=False)
 
         def __init__(self, user_id, score):
             self.user_id = user_id
@@ -84,10 +84,14 @@ if DB_TYPE == "postgres":
         images_id = db.Column(db.Integer, primary_key=True)
         user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
         image = db.Column(db.String(200), nullable=False)
+        url = db.Column(db.String(200), nullable=False)
+        author = db.Column(db.String(200))
 
-        def __init__(self, user_id, image):
+        def __init__(self, user_id, image, url, author):
             self.user_id = user_id
             self.image = image
+            self.url = url
+            self.author = author
 
 ''' End of Postgres configuration '''
 
@@ -120,7 +124,7 @@ def getscores():
         db = SQLAlchemy(app)
 
         # Get user id
-        user = db.session.query(Users).filter(Users.user == username).first()
+        user = db.session.query(Users).filter(Users.username == username).first()
         
         # Prepare data
         data = Scores(user.id, score)
@@ -165,6 +169,8 @@ def deletephoto():
 
     # Check if photo is already in db
     rows = db.execute("""SELECT * FROM images WHERE user_id = (SELECT id FROM users WHERE username = ?) AND image = ?;""", (username, image))
+    if len(rows.fetchall()) == 0:
+        return jsdata
    
     # Delete the photo
     db.execute("""DELETE FROM images WHERE user_id = (SELECT id FROM users WHERE username = ?) AND image = ?;""", (username, image))
@@ -192,24 +198,42 @@ def getlikes():
     author = data["author"]
     username = data["username"]
 
-    # Open db and writes into it
-    memory = sqlite3.connect("memory.db")
-    db = memory.cursor()
+    # If we use "postgres"
+    if DB_TYPE == "postgres":
+        db = SQLAlchemy(app)
 
-    # Check if photo is already in db
-    rows = db.execute("""SELECT * FROM images WHERE user_id = (SELECT id FROM users WHERE username = ?) AND image = ?;""", (username, image))
+        # If image alredy exists
+        if db.session.query(Images).filter(Images.image == image).count() == 1:
+            return jsdata
 
-    # Ensure username does not already exists ( fetchall() )
-    if len(rows.fetchall()):
+        # Get user id
+        user = db.session.query(Users).filter(Users.username == username).first()
+
+        # Insert into database
+        data = Images(user.id, image, url, author)
+        db.session.add(data)
+        db.session.commit()
+
+    # If we use "sqlite"
+    else:
+        # Open db and writes into it
+        memory = sqlite3.connect("memory.db")
+        db = memory.cursor()
+
+        # Check if photo is already in db
+        rows = db.execute("""SELECT * FROM images WHERE user_id = (SELECT id FROM users WHERE username = ?) AND image = ?;""", (username, image))
+
+        # Ensure username does not already exists ( fetchall() )
+        if len(rows.fetchall()):
+            memory.close()
+            return jsdata
+
+        db.execute("""INSERT INTO images (image, url, author, user_id) VALUES 
+                (?, ?, ?, (SELECT id FROM users WHERE username = ?));""", (image, url, author, username))
+
+        # Save input and close it
+        memory.commit()
         memory.close()
-        return jsdata
-
-    db.execute("""INSERT INTO images (image, url, author, user_id) VALUES 
-               (?, ?, ?, (SELECT id FROM users WHERE username = ?));""", (image, url, author, username))
-
-    # Save input and close it
-    memory.commit()
-    memory.close()
     
     # Return js data in order to avoid error ...
     return jsdata
@@ -222,15 +246,24 @@ def scores():
     # Get username, if logged in
     username = get_username(DB_TYPE, Users)
     
-    # Initialize db
-    memory = sqlite3.connect("memory.db")
-    memory.row_factory = sqlite3.Row
-    db = memory.cursor()
+    # If we use Postgres
+    if DB_TYPE == "postgres":
+        db = SQLAlchemy(app)
+        # with_entities creates one object, instead of to objects as default
+        # order of command my matter
+        top_scores = db.session.query(Scores, Users).join(Users).with_entities(Scores.score, Users.username).order_by(Scores.score.desc()).limit(10).all()
     
-    # Query db
-    top_scores = db.execute(""" SELECT users.username, scores.score FROM scores JOIN users
-                            ON scores.user_id = users.id ORDER BY scores.score DESC LIMIT 10;""")
-    # We dont close db (memory.clos()), becasue webpage cant operate on closed db 
+    # If we use Sqlite
+    else:
+        # Initialize db
+        memory = sqlite3.connect("memory.db")
+        memory.row_factory = sqlite3.Row
+        db = memory.cursor()
+        
+        # Query db
+        top_scores = db.execute(""" SELECT users.username, scores.score FROM scores JOIN users
+                                ON scores.user_id = users.id ORDER BY scores.score DESC LIMIT 10;""")
+        # We dont close db (memory.clos()), becasue webpage cant operate on closed db 
 
     return render_template("scores.html", username=username, top_scores=top_scores)
 
@@ -260,11 +293,11 @@ def login():
             db = SQLAlchemy(app)
 
             # Check if user exists
-            if db.session.query(Users).filter(Users.user == username).count() != 1:
+            if db.session.query(Users).filter(Users.username == username).count() != 1:
                 return sorry("Username does not exist", 403)
 
             # Query for user in db, get id and password hash
-            user = db.session.query(Users).filter(Users.user == username).first()
+            user = db.session.query(Users).filter(Users.username == username).first()
             
             hash_pass = user.hash
             userid = user.id
@@ -345,7 +378,7 @@ def register():
         if DB_TYPE == "postgres":
             db = SQLAlchemy(app)
             # Ensure username does not already exists
-            if db.session.query(Users).filter(Users.user == username).count() == 0:
+            if db.session.query(Users).filter(Users.username == username).count() == 0:
                 # Hash password and insert user into db
                 hash_password = generate_password_hash(password, method='pbkdf2:sha256', salt_length=16)
 
