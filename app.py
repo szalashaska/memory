@@ -50,7 +50,7 @@ if DB_TYPE == "postgres":
 
     else:
         app.debug = False
-        app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://wooehgymbagblq:426a594015c9df551403f765a42cb0bf281a8f2559b530c412db430764eb20fa@ec2-34-239-196-254.compute-1.amazonaws.com:5432/d3lqs3f5nmk6tg'
+        app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://ooaculqmqsynao:8bf857ef192d24953c10fd6ed924df47ff1b4687f3c0943561b3863f5d0d4079@ec2-18-234-17-166.compute-1.amazonaws.com:5432/d6m7261f405dgn'
 
     # Switching of modification tracking and setting up the DB
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
