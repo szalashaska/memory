@@ -47,7 +47,7 @@ app.config["TEMPLATES_AUTO_RELOAD"] = True
 if DB_TYPE == "postgres":
     if ENV == "dev":
         # ...//username:password@localhost/database_name
-        app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:postgres@localhost/memory'
+        app.config['SQLALCHEMY_DATABASE_URI'] = ''
         app.config['SQLALCHEMY_ENGINE_OPTIONS'] = { 'poolclass': NullPool, }
 
     else:
