@@ -19,6 +19,7 @@ ENV = "prod"
 # Import Datbase modul
 if DB_TYPE == "postgres":
     from flask_sqlalchemy import SQLAlchemy
+    from sqlalchemy.pool import NullPool
 else:
     import sqlite3
     # If we use Sqlite we do not need declare Username variable to avoid error
@@ -47,11 +48,12 @@ if DB_TYPE == "postgres":
     if ENV == "dev":
         # ...//username:password@localhost/database_name
         app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:postgres@localhost/memory'
+        app.config['SQLALCHEMY_ENGINE_OPTIONS'] = { 'poolclass': NullPool, }
 
     else:
         app.debug = False
         app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://ooaculqmqsynao:8bf857ef192d24953c10fd6ed924df47ff1b4687f3c0943561b3863f5d0d4079@ec2-18-234-17-166.compute-1.amazonaws.com:5432/d6m7261f405dgn'
-
+        app.config['SQLALCHEMY_ENGINE_OPTIONS'] = { 'poolclass': NullPool, }
     # Switching of modification tracking and setting up the DB
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     
@@ -102,7 +104,7 @@ def index():
     '''Renders Homepage'''
 
     # Get username, if logged in
-    username = get_username(DB_TYPE, Users)
+    username = get_username()
 
     return render_template("index.html", username=username)
 
@@ -134,6 +136,7 @@ def getscores():
         # Add and commit data to db
         db.session.add(data)
         db.session.commit()
+        db.session.close()
         
         return jsdata
 
@@ -176,6 +179,7 @@ def deletephoto():
         if photo:
             db.session.delete(photo)
             db.session.commit()
+            db.session.close()
 
     # If we use Sqlite
     else:
@@ -229,6 +233,7 @@ def getlikes():
         data = Images(user.id, image, url, author)
         db.session.add(data)
         db.session.commit()
+        db.session.close()
 
     # If we use "sqlite"
     else:
@@ -260,7 +265,7 @@ def scores():
     ''' Reads scores from database and renders it '''
 
     # Get username, if logged in
-    username = get_username(DB_TYPE, Users)
+    username = get_username()
     
     # If we use Postgres
     if DB_TYPE == "postgres":
@@ -268,7 +273,8 @@ def scores():
         # with_entities creates one object, instead of to objects as default
         # order of command may matter
         top_scores = db.session.query(Scores, Users).join(Users).with_entities(Scores.score, Users.username).order_by(Scores.score.desc()).limit(10).all()
-    
+        db.session.close()
+        
     # If we use Sqlite
     else:
         # Initialize db
@@ -324,6 +330,9 @@ def login():
 
             # Remember the user
             session["user_id"] = userid
+            session["user"] = username
+
+            db.session.close()
             
             return redirect("/")
 
@@ -403,6 +412,7 @@ def register():
 
                 # Commit/save changes and redirect to users account
                 db.session.commit()
+                db.session.close()
 
                 return redirect("/login")
             else:
@@ -455,7 +465,7 @@ def myaccount():
     '''Render users account (his scores and favourite pictures)'''
 
     # Get username, if logged in
-    username = get_username(DB_TYPE, Users)
+    username = get_username()
 
     #If we use Postgres
     if DB_TYPE == "postgres":
@@ -466,6 +476,8 @@ def myaccount():
 
         # Get images
         photos = db.session.query(Images, Users).join(Users).where(Users.username == username).with_entities(Images.image, Images.url, Images.author).all()
+
+        db.session.close()
 
     # If we use Sqlite
     else:
@@ -499,7 +511,7 @@ def specify():
     '''Renders specify'''
 
     # Get username, if logged in
-    username = get_username(DB_TYPE, Users)
+    username = get_username()
 
     return render_template("specify.html", username=username)
 
@@ -509,7 +521,7 @@ def game():
     '''Creates game that user defined, gets photos form API'''
 
     # Get username, if logged in
-    username = get_username(DB_TYPE, Users)
+    username = get_username()
 
     if request.method == "POST":
         # Get users input
