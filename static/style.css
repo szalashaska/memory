@@ -1,4 +1,4 @@
-/*Google fonts*/
+/* Google fonts */
 @import url("https://fonts.googleapis.com/css2?family=Big+Shoulders+Inline+Text:wght@800&family=Dosis&family=Faster+One&family=Monoton&display=swap");
 
 :root {
@@ -30,7 +30,7 @@
   box-sizing: border-box;
 }
 
-/*Typography*/
+/* Typography */
 h1,
 h2,
 h3 {
@@ -73,12 +73,34 @@ p {
     font-size: 3rem;
   }
 
-  p {
+  p,
+  input,
+  select {
     font-size: 1.2rem;
   }
 }
 
-/*Button and input*/
+@media screen and (min-width: 1650px) {
+  h1 {
+    font-size: 6rem;
+  }
+
+  h2 {
+    font-size: 4.5rem;
+  }
+
+  h3 {
+    font-size: 3.5rem;
+  }
+
+  p,
+  input,
+  select {
+    font-size: 1.8rem;
+  }
+}
+
+/* Button and input */
 button {
   font-family: var(--font-special);
   font-size: 1.8em;
@@ -105,6 +127,12 @@ button:focus {
   }
 }
 
+@media screen and (min-width: 1650px) {
+  button {
+    font-size: 3rem;
+  }
+}
+
 input,
 select {
   font-family: var(--font-normal);
@@ -113,17 +141,18 @@ select {
   border-radius: 10px;
   border: none;
   background-color: var(--clr-light-blue);
+  transition: all 0.3s ease;
 }
 
 select:hover,
 select:focus,
 input:hover,
 input:focus {
-  background-color: var(--clr-yellow);
+  background-color: var(--clr-white);
   box-shadow: 0 0 10px rgba(255, 255, 2550.8);
 }
 
-/*Layout*/
+/* Layout */
 
 nav {
   padding: 1rem;
@@ -195,7 +224,7 @@ nav {
   background-color: var(--clr-blue);
 }
 
-/* Hamburger and cross */
+/*  Hamburger and cross in navbar button  */
 
 .navbar-button span,
 .navbar-button span::before,
@@ -238,7 +267,7 @@ nav {
 .navbar-button.clicked span::before {
   opacity: 0;
 }
-/* ------- */
+/*  -------  */
 
 .background-wrapper {
   width: 100%;
@@ -250,6 +279,7 @@ nav {
   margin-inline: auto;
   padding: 2rem;
   max-width: 1750px;
+  min-height: calc(100vh - var(--height-footer) - var(--height-navbar));
 }
 
 footer,
@@ -293,7 +323,6 @@ footer {
   }
   .max-width-wrapper {
     padding: 3rem;
-    min-height: calc(100vh - var(--height-footer) - var(--height-navbar));
   }
 
   footer {
@@ -301,15 +330,57 @@ footer {
   }
 }
 
-/*Other css*/
-/*Other css*/
-/*Other css*/
-/*Other css*/
-/*Other css*/
-/*Other css*/
-/*Other css*/
+/* Index */
 
-/*Medium screen*/
+.logo {
+  font-size: 1em;
+  font-family: var(--font-special-big);
+}
+
+.logo--yellow {
+  color: var(--clr-yellow);
+}
+
+.get-started-form {
+  display: flex;
+  justify-content: center;
+}
+
+@media screen and (min-width: 900px) {
+  .index-wrapper {
+    padding-inline: 2rem;
+  }
+  .get-started-form {
+    justify-content: flex-end;
+  }
+
+  .logo {
+    font-size: 1.2em;
+  }
+}
+
+/* Specify */
+
+.game-form,
+.specify-wrapper {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.specify-wrapper {
+  padding-block: 2rem;
+  gap: 1.2rem;
+  text-align: center;
+}
+
+.game-form input,
+.game-form select {
+  width: 100%;
+}
+
+/* Medium screen */
 .card_frame {
   width: 15vw;
   height: 15vw;
@@ -321,7 +392,7 @@ footer {
   transition: box-shadow 1s;
 }
 
-/*Big screen*/
+/* Big screen */
 @media (min-width: 768px) {
   .card_frame {
     width: 8vw;
@@ -329,7 +400,7 @@ footer {
   }
 }
 
-/*Small screen*/
+/* Small screen */
 @media (max-width: 576px) {
   .card_frame {
     width: 30vw;

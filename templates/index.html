@@ -1,8 +1,13 @@
 {% extends "layout.html" %} {% block title %} Welcome! {% endblock%}
 <!-- -->
 {% block main %}
-<div>
-  <h1>Welcome to the <span class="logo_font">Memory</span>!</h1>
+<div class="index-wrapper">
+  <h1>
+    Welcome to the
+    <span class="logo">
+      M<span class="logo--yellow">e</span>m<span class="logo--yellow">o</span>ry
+    </span>
+  </h1>
 
   <p>
     Memory is a simple card game. Your task is to find the matching pairs and to
@@ -26,8 +31,8 @@
   </p>
 </div>
 <div>
-  <form action="/specify" method="GET">
-    <button class="btn_yellow" type="submit">Let's get started!</button>
+  <form class="get-started-form" action="/specify" method="GET">
+    <button type="submit">Let's get started!</button>
   </form>
 </div>
 
