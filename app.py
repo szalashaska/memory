@@ -1,6 +1,7 @@
 import os
-
-from flask import Flask, request, render_template, session, redirect, jsonify, json
+from pathlib import Path
+from dotenv import load_dotenv
+from flask import Flask, request, render_template, session, redirect, json
 from flask_session import Session
 from werkzeug.security import check_password_hash, generate_password_hash
 from tempfile import mkdtemp
@@ -9,6 +10,10 @@ from random import shuffle, randint
 from datetime import datetime
 
 from helpers import get_images, login_required, sorry, get_username
+
+# Environment settings
+BASE_DIR = Path(__file__).resolve().parent.parent
+load_dotenv(os.path.join(BASE_DIR, ".env"))
 
 # Choose between Postgres and Sqlite: "postgres" or "sqlite" 
 DB_TYPE = "postgres"
@@ -29,16 +34,7 @@ else:
 # Configure app
 app = Flask(__name__)
 
-app.secret_key = "!?%Memory^&*by#^&*Kamil*^$Petryniak"
-
-# Alternative session settings for local filesytem
-'''
-# Configure session to use filesystem (instead of signed cookies)
-app.config["SESSION_FILE_DIR"] = mkdtemp()
-app.config["SESSION_PERMANENT"] = False
-app.config["SESSION_TYPE"] = "filesystem"
-Session(app)
-'''
+app.secret_key = os.getenv("SECRET_KEY")
 
 # Ensure templates are auto-reloaded
 app.config["TEMPLATES_AUTO_RELOAD"] = True
@@ -52,7 +48,7 @@ if DB_TYPE == "postgres":
 
     else:
         app.debug = False
-        app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://ooaculqmqsynao:8bf857ef192d24953c10fd6ed924df47ff1b4687f3c0943561b3863f5d0d4079@ec2-18-234-17-166.compute-1.amazonaws.com:5432/d6m7261f405dgn'
+        app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv("DATABASE_URL")
         app.config['SQLALCHEMY_ENGINE_OPTIONS'] = { 'poolclass': NullPool, }
     # Switching of modification tracking and setting up the DB
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -152,7 +148,6 @@ def getscores():
         memory.commit()
         memory.close()
         
-        # Return js data in order to avoid error ...
         return jsdata
 
 
@@ -199,7 +194,6 @@ def deletephoto():
         memory.commit()
         memory.close()
     
-    # Return js data in order to avoid error ...
     return jsdata
 
 
@@ -525,10 +519,10 @@ def game():
 
     if request.method == "POST":
         # Get users input
-        try:
-            cards_quantity = int(request.form.get("cards_quantity"))
-        except:
-            return sorry("You did not provide number of cards. Choose from dropdown list")
+        request_card_number = request.form.get("cards_quantity") 
+      
+        cards_quantity = int(request_card_number) if request_card_number else 12 
+       
         game_theme = request.form.get("game_theme").strip().replace(" ", "+")
 
         # Check users input
@@ -542,7 +536,8 @@ def game():
 
         # Quick game case
         if game_theme == "no_users_input":
-            game_themes = ["moutains", "flowers", "animals", "country", "christmas", "ladnscape", "london", "new york", "garden", "trees", "space", "sky", "clouds", "random", "paris", "dolomites"]
+            game_themes = ["moutains", "flowers", "animals", "country", "christmas", "ladnscape", "london", "new york",
+                          "garden", "trees", "space", "sky", "clouds", "random", "paris", "dolomites"]
             index = randint(0, len(game_themes) - 1)
             game_theme = game_themes[index]
                 

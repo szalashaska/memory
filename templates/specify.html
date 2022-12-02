@@ -1,57 +1,54 @@
-{% extends "layout.html" %}
-
-{% block title %}
-Tailor your game!
-{% endblock%}
-
-{% block main %}
+{% extends "layout.html" %} {% block title %} Tailor your game! {% endblock%} {%
+block main %}
 
 <div class="row justify-content-center text-center">
-    <div class="col-md-6">
-        <p>
-            Here you can personalize your experience: 
-            choose the theme of the game and pick with how many card You will play.
-        </p>
-    </div>
+  <div class="col-md-6">
+    <p>
+      Here you can personalize your experience: choose the theme of the game and
+      pick with how many card You will play.
+    </p>
+  </div>
 </div>
 
 <div class="row justify-content-center text-center">
-    <div class="col-md-6">
-        <form action="/game" method="POST">
-            <div class="m-2">
-                <input class="form-control" name="game_theme" type="text" placeholder="Type something ..." required>
-            </div> 
-            <div class="m-2">
-                <select class="form-select" name="cards_quantity" required>
-                    <option selected disabled>Choose how many cards to play with</option>
-                    <option value="12">12</option>
-                    <option value="24">24</option>
-                    <option value="36">36</option>
-                </select>
-            </div>         
-            <button class="btn btn_yellow" type="submit" >Start game!</button>    
-        </form>
-    </div>
+  <div class="col-md-6">
+    <form action="/game" method="POST">
+      <div class="m-2">
+        <input
+          class="form-control"
+          name="game_theme"
+          type="text"
+          placeholder="Type something ..."
+          required
+        />
+      </div>
+      <div class="m-2">
+        <select class="form-select" name="cards_quantity" required>
+          <option selected disabled>Choose how many cards to play with</option>
+          <option value="12">12</option>
+          <option value="24">24</option>
+          <option value="36">36</option>
+        </select>
+      </div>
+      <button class="btn btn_yellow" type="submit">Start game!</button>
+    </form>
+  </div>
 </div>
 
 <div class="row justify-content-center text-center">
-    <div class="col-md-6 p-2">
-        Or simply:
-    </div>
+  <div class="col-md-6 p-2">Or simply:</div>
 </div>
 
 <div class="row justify-content-center text-center">
-    <div class="col-md-5">
-        <form action="/game" method="POST">
-            <div class="d-grid col-4 mx-auto">
-                <input name="cards_quantity" value="12" type="hidden">
-                <input name="game_theme" value="no_users_input" type="hidden">
-                <button class="btn btn_yellow" type="submit" >Quick start!</button>    
-            </div>
-        </form>       
-    </div>
+  <div class="col-md-5">
+    <form action="/game" method="POST">
+      <div class="d-grid col-4 mx-auto">
+        <input name="cards_quantity" value="12" type="hidden" />
+        <input name="game_theme" value="no_users_input" type="hidden" />
+        <button class="btn btn_yellow" type="submit">Quick start!</button>
+      </div>
+    </form>
+  </div>
 </div>
-
-
 
 {% endblock %}

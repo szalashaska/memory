@@ -1,41 +1,34 @@
-{% extends "layout.html" %}
-
-{% block title %}
-Welcome!
-{% endblock%}
-
+{% extends "layout.html" %} {% block title %} Welcome! {% endblock%}
+<!-- -->
 {% block main %}
+<div>
+  <h1>Welcome to the <span class="logo_font">Memory</span>!</h1>
 
-<div class="row justify-content-center">
-    <div class="col-md-10 text_font">
-        <h1>Welcome to the <span class="logo_font">Memory<span>!</h1>
-        <p>
-            Memory is a simple card game. Your task is to find the matching pairs and to have fun while doing it!
-            So, as You see, it is not at all complicated. 
-        </p>
-        <p>
-            To spice things up we are keeping score, while You playing.
-            The score takes into account how quick You are, so try to be as fast as possible. 
-            And if You find pairs in consecutive order, that also will be rewarded.
-            The best players will be shown in our Top Scores table. But only if they register first, so there is no stranger on the board.
-        </p>
-        <p>
-            In order to make this game more interesting You get to choose Your own theme of cards. Just type anything
-            You like and enjoy the game. And if You do not feel like typing anything just use the "Quick Start" button.
-        </p>
-        <p>
-            Did You like the photos behind cards? You can check them out after the game! For those, who decide to register,
-            we can save the liked photos in our account.
-        </p>
-    </div>
+  <p>
+    Memory is a simple card game. Your task is to find the matching pairs and to
+    have fun while doing it! So let's have fun!
+  </p>
+  <p>
+    To spice things up we are keeping score, while you playing. The score takes
+    into account how quick you are, so try to be as fast as possible. And if you
+    find pairs in consecutive order, that also will be rewarded. The best
+    players will be shown in our Top Scores table. But only if they register
+    first, so there is no stranger on the board.
+  </p>
+  <p>
+    To make game even more interesting you get to choose your own theme of
+    cards. Just type anything you like and we will try to find. If you do not
+    feel like typing anything just use the "Quick Start" button.
+  </p>
+  <p>
+    Did you like the photos behind cards? Check them out after the game! For
+    those, who decide to register, we can save the liked photos in our account.
+  </p>
 </div>
-<br>
-<div class="row justify-content-center my-2">
-    <div class="col-6 d-flex justify-content-center">
-        <form action="/specify" method="GET">
-            <button class="btn btn_yellow" type="submit" style="font-size: 40px">Let's get started!</button>              
-        </form>
-    </div>
+<div>
+  <form action="/specify" method="GET">
+    <button class="btn_yellow" type="submit">Let's get started!</button>
+  </form>
 </div>
 
 {% endblock %}
