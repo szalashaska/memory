@@ -1,0 +1,340 @@
+{% extends "layout.html" %} {% block title %} Game time! {% endblock%}
+<!-- -->
+{% block main %}
+
+<!--Score display-->
+<div class="row justify-content-center" id="score_output_conteiner">
+  <div class="col-6 p-3 d-flex justify-content-center">
+    <p1 class="header_font"
+      >Your Score: <span id="score_output" class="header_font">0</span></p1
+    >
+  </div>
+</div>
+
+<!--Game cards-->
+<div class="row justify-content-between" id="card_game_conteiner">
+  {% for i in range(0, 2 * pairs) %}
+  <div class="col-3 col-md-1 col-sm-2 p-2 d-flex justify-content-center">
+    <div class="card_frame">
+      <img
+        class="card_back"
+        id="{{ i }}"
+        src="../static/images/card_back.jpg"
+        alt="Back of a card"
+        onclick="flip_card(event)"
+      />
+    </div>
+  </div>
+  {% endfor %}
+</div>
+
+<!--After game is over screen-->
+<div class="conteiner game_over" id="game_over_screen">
+  <div class="row justify-content-center text-center">
+    <div class="col-10">
+      <p1>Fantastic game, {{ username | upper }}!</p1>
+    </div>
+    <div class="col-10">
+      <p1>Your score was: </p1>
+    </div>
+    <div class="col-10">
+      <p1 class="score_font" id="final_score"></p1>
+    </div>
+  </div>
+
+  <!--Buttons-->
+  <div class="row justify-content-center">
+    <div class="col-md-3 p-3 d-flex justify-content-center">
+      <form action="/game" method="POST">
+        <input name="cards_quantity" value="{{ pairs * 2 }}" type="hidden" />
+        <input name="game_theme" value="{{ game_theme }}" type="hidden" />
+        <button class="btn btn_yellow" type="submit">Try again!</button>
+      </form>
+    </div>
+    <div class="col-md-3 p-3 d-flex justify-content-center">
+      <a href="/specify"
+        ><button class="btn btn_yellow" type="button">
+          Craft your game once more
+        </button></a
+      >
+    </div>
+    <div class="col-md-3 p-3 d-flex justify-content-center">
+      <a href="/"
+        ><button class="btn btn_yellow" type="button">
+          Back to the homepage
+        </button></a
+      >
+    </div>
+    <div class="col-md-3 p-3 d-flex justify-content-center">
+      <a href="/scores"
+        ><button class="btn btn_yellow" type="button">
+          Let's see the scores
+        </button></a
+      >
+    </div>
+  </div>
+  <div class="row justify-content-center">
+    <div class="col-md-3 p-3 d-flex justify-content-center">
+      <button
+        class="btn btn_yellow"
+        type="button"
+        onclick="show_cards_to_like()"
+      >
+        Show images
+      </button>
+    </div>
+  </div>
+
+  <!--Hidden cards-->
+  <div class="conteiner hidden_cards_conteiner" id="like_card_conteiner">
+    <div class="row">
+      {% for i in range(0, pairs) %}
+      <div class="col-12 col-sm-6 col-md-3">
+        <div class="card mb-4">
+          <div class="card-body">
+            <div class="card_fixed_hight">
+              <img
+                class="card-img-top liked_card"
+                id="picture{{ loop.index - 1 }}"
+                src=""
+                alt="Pictures used in game"
+                class="image-fluid"
+              />
+            </div>
+            <div class="h-30">
+              <p class="card-text"><i class="bi bi-camera"></i> Author:</p>
+              <p class="card-text" id="author{{ loop.index - 1 }}"></p>
+              <a href="#" id="link{{ loop.index - 1 }}" target="_blank"
+                ><p><i class="bi bi-link"></i>Link</p></a
+              >
+              {% if session.user_id %}
+              <p
+                class="card-text"
+                id="like{{ loop.index - 1 }}"
+                style="cursor: pointer"
+                onclick="post_liked_photo(event)"
+              >
+                <i class="bi bi-heart"></i> Add to liked photos
+              </p>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+<script>
+  /* Variables to work with script */
+  /* URLs from API*/
+  let DATA = JSON.parse("{{ memory | tojson | safe }}");
+  /* other */
+  var COUNTER = (MATCHES = SCORE = CONSECUTIVE = 0);
+  var BONUS = 10; /* BONUS multiplier value*/
+  var BONUSS = 1000;
+  let PAIRS_IN_GAME = parseInt("{{ pairs | safe }}", 10);
+  var FIRST_FLIP, FIRST_FLIP_ID;
+  var MEMORY_LOGO = "../static/images/card_back.jpg";
+
+  /* Lowers the BONUS point multiplier with time*/
+  function bonus_point() {
+    if (BONUS == 0) {
+      return;
+    } else {
+      setTimeout(function () {
+        BONUS--;
+        bonus_point();
+      }, 5000);
+    }
+  }
+
+  /* Lowers the BONUSs points with time*/
+  function bonuss_point() {
+    if (BONUSS == 0) {
+      return;
+    } else {
+      setTimeout(function () {
+        BONUSS = BONUSS - 2;
+        bonuss_point();
+      }, 1000);
+    }
+  }
+
+  /* Initiate0 BONUS point function */
+  document.addEventListener("DOMContentLoaded", function () {
+    bonus_point();
+    bonuss_point();
+  });
+
+  /* Flips card, call pair checking and recording the match/no match function */
+  function flip_card(event) {
+    /* Access only if one or none cards are flipped */
+    if (COUNTER <= 1) {
+      COUNTER++;
+      let card = event.srcElement;
+      let id = card.id;
+
+      /* Take image URL from the DATA list */
+      let image = DATA[id]["image"];
+      card.src = image;
+
+      /* If we flip the first card, update and return */
+      if (COUNTER == 1) {
+        FIRST_FLIP = image;
+        FIRST_FLIP_ID = id;
+        return;
+      } else if (pair_check(image, id)) {
+        /* Otherwise check pair for a match and call appropriate function */
+        return match(FIRST_FLIP_ID, id), scores();
+      } else {
+        return no_match(FIRST_FLIP_ID, id);
+      }
+    }
+  }
+
+  /* Check if pairs match each other, updates MATCHES and CONSECUTIVE */
+  function pair_check(image, id) {
+    let SECOND_FLIP = image;
+    if (FIRST_FLIP == SECOND_FLIP && FIRST_FLIP_ID != id) {
+      MATCHES++;
+      CONSECUTIVE++;
+      return true;
+    } else {
+      CONSECUTIVE = 0;
+      return false;
+    }
+  }
+
+  /* Hide the cards that match, reset the COUNTER */
+  function match(FIRST_FLIP_ID, second_id) {
+    setTimeout(function () {
+      document.getElementById(FIRST_FLIP_ID).parentElement.style.visibility =
+        "hidden";
+      document.getElementById(second_id).parentElement.style.visibility =
+        "hidden";
+      COUNTER = 0;
+    }, 1200);
+    document.getElementById(FIRST_FLIP_ID).parentElement.style.boxShadow =
+      "0px 0px 40px 20px rgb(96, 153, 45)";
+    document.getElementById(second_id).parentElement.style.boxShadow =
+      "0px 0px 40px 20px rgb(96, 153, 45)";
+  }
+
+  /* Flip the cards back, reset the COUNTER */
+  function no_match(FIRST_FLIP_ID, second_id) {
+    setTimeout(function () {
+      document.getElementById(FIRST_FLIP_ID).parentElement.style.boxShadow = "";
+      document.getElementById(second_id).parentElement.style.boxShadow = "";
+      document.getElementById(FIRST_FLIP_ID).src = MEMORY_LOGO;
+      document.getElementById(second_id).src = MEMORY_LOGO;
+      COUNTER = 0;
+    }, 1200);
+    document.getElementById(FIRST_FLIP_ID).parentElement.style.boxShadow =
+      "0px 0px 40px 20px rgb(247, 23, 53)";
+    document.getElementById(second_id).parentElement.style.boxShadow =
+      "0px 0px 40px 20px rgb(247, 23, 53)";
+  }
+
+  /* Keeps SCORE of the game */
+  function scores() {
+    let score_output = document.getElementById("score_output");
+    SCORE = SCORE + 100 * BONUS + 100 * CONSECUTIVE + BONUSS;
+    score_output.innerHTML = SCORE;
+  }
+
+  /* Calling fuctions after clicking on card by using QuerySelector */
+  let cards_in_game = document.querySelectorAll(".card_back");
+
+  /* Appending EventListener on array of selected cards */
+  for (let i = 0, n = cards_in_game.length; i < n; i++) {
+    cards_in_game[i].addEventListener("click", function () {
+      if (MATCHES == PAIRS_IN_GAME) {
+        game_over();
+        post_scores();
+      }
+    });
+  }
+
+  /* Informs user when the game is over */
+  function game_over() {
+    setTimeout(function () {
+      let final_score = document.getElementById("final_score");
+      let score_output = document.getElementById("score_output_conteiner");
+      final_score.innerHTML = SCORE;
+
+      /* Get card conteiner and push it backward*/
+      let cards = document.getElementById("card_game_conteiner");
+      cards.style.display = "none";
+
+      /* Display the final message, hide ingame score */
+      let game_over_screen = document.getElementById("game_over_screen");
+      game_over_screen.style.display = "block";
+      score_output.style.display = "none";
+    }, 1000);
+  }
+
+  /* Updates the score table */
+  function post_scores() {
+    let name = "{{ username }}";
+
+    /* If user is logged in */
+    if (name != "Stranger") {
+      $.post("/getscores", {
+        /* We are sending an JSON dict, see the differance ` and " " */
+        js_data: `{"score": ${SCORE}, "username": "${name}"}`,
+      });
+    }
+  }
+
+  /* Shows cards once more after the game */
+  function show_cards_to_like() {
+    /* Query cards and show them */
+    let conteiner = document.getElementById("like_card_conteiner");
+    conteiner.style.display = "flex";
+
+    /* remove duplicates from data */
+    /*https://www.codegrepper.com/code-examples/javascript/extract+distinct+key+from+dictionary+javascript*/
+    const key = "image";
+    const uniq = [...new Map(DATA.map((item) => [item[key], item])).values()];
+
+    cards = document.querySelectorAll(".liked_card");
+    for (let i = 0, n = cards.length; i < n; i++) {
+      cards[i].src = uniq[i]["image"];
+      document.getElementById(`author${i}`).innerHTML = uniq[i]["author"];
+      document.getElementById(`link${i}`).href = uniq[i]["url"];
+    }
+  }
+
+  /* Sends photos to liked db */
+  function post_liked_photo(event) {
+    let name = "{{ username }}";
+    let button = event.srcElement;
+
+    /* If user is logged in */
+    if (name != "Stranger") {
+      /* Get the id by selecting the i-th character*/
+      let id = button.id;
+      id = id[4];
+
+      /* Get the info from card*/
+
+      let image = document.getElementById(`picture${id}`).src;
+      let url = document.getElementById(`link${id}`).href;
+      let author = document.getElementById(`author${id}`).innerHTML;
+
+      $.post("/getlikes", {
+        /* We are sending an JSON dict, see the differance ` and " " */
+        js_data: `{"image": "${image}", "url" : "${url}", "author" : "${author}", "username": "${name}"}`,
+      });
+
+      /* Inform the user of success*/
+      document.getElementById(`picture${id}`).style.opacity = 0.2;
+      button.innerHTML = "<i class='bi bi-heart-fill'></i>";
+      button.onclick = null;
+    }
+  }
+</script>
+
+{% endblock %}

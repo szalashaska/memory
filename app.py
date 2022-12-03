@@ -16,7 +16,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 load_dotenv(os.path.join(BASE_DIR, ".env"))
 
 # Choose between Postgres and Sqlite: "postgres" or "sqlite" 
-DB_TYPE = "sqlite"
+DB_TYPE = "postgres"
 
 # Choose between development and production: "dev" or "prod"
 ENV = "prod"
@@ -161,6 +161,8 @@ def deletephoto():
     jsdata = request.get_json()
     image = jsdata["image"]
     username = jsdata["username"]
+
+    print(image, username)
 
 # If we use Postgres
     if DB_TYPE == "postgres":
@@ -542,11 +544,7 @@ def game():
                 
         try:
             # Pass users input into API-function
-            images = get_images(game_theme, pairs)
-
-            # Make list twice as big and shuffle it for random placement
-            images = images + images
-            shuffle(images)
+            images = get_images(game_theme, pairs)         
 
         except:
             # In case API does not respond - append static images
@@ -554,11 +552,11 @@ def game():
             for i in range(0, pairs):
                 images.append({"image" : f"../static/images/{i}.jpeg"})
 
-            # Make list twice as big and shuffle it for random placement
-            images = images + images
-            shuffle(images)
+        # Make list twice as big and shuffle it for random placement
+        game = images + images
+        shuffle(game)
 
-        return render_template("game.html", pairs=pairs, memory=images, username=username, game_theme=game_theme)
+        return render_template("game.html", pairs=pairs, images=images, memory=game, username=username, game_theme=game_theme)
 
     else:
         return redirect("/specify")

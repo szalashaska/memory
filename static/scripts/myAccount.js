@@ -7,8 +7,8 @@
 const deleteButtons = document.querySelectorAll(".photo-card__button");
 
 const handleDeletePhoto = async (e) => {
-  // Get image link
-  const imageURL = e.target.previousElementSibling.href;
+  // Get image link: button -> parrent div -> image
+  const imageURL = e.target.parentNode.firstElementChild.src;
 
   // Prepare data; user is set in other file
   const data = {

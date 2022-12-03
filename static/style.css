@@ -1,5 +1,5 @@
 /* Google fonts */
-@import url("https://fonts.googleapis.com/css2?family=Big+Shoulders+Inline+Text:wght@800&family=Dosis&family=Faster+One&family=Monoton&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Big+Shoulders+Inline+Text:wght@800&family=Dosis&family=Monoton&display=swap");
 
 :root {
   --clr-yellow: #e0ff4f;
@@ -16,7 +16,6 @@
   --font-special-big: "Monoton", cursive;
   --font-special: "Big Shoulders Inline Text", cursive;
   --font-normal: "Dosis", sans-serif;
-  --font-score: "Faster One", cursive;
 
   --height-navbar: 105px;
   --height-footer: 135px;
@@ -101,6 +100,7 @@ p {
 }
 
 /* Button and input */
+.link-button,
 button {
   font-family: var(--font-special);
   font-size: 1.8em;
@@ -113,7 +113,8 @@ button {
   cursor: pointer;
   transition: all 0.3s ease;
 }
-
+.link-button:focus,
+.link-button:hover,
 button:hover,
 button:focus {
   background-color: var(--clr-violet);
@@ -122,15 +123,22 @@ button:focus {
 }
 
 @media screen and (min-width: 700px) {
+  .link-button,
   button {
     font-size: 2rem;
   }
 }
 
 @media screen and (min-width: 1650px) {
+  .link-button,
   button {
     font-size: 3rem;
   }
+}
+
+.link-button {
+  text-decoration: none;
+  display: inline-block;
 }
 
 input,
@@ -404,9 +412,14 @@ footer {
   text-align: center;
 }
 
+.login-text a {
+  color: var(--clr-yellow);
+}
+
 @media screen and (min-width: 900px) {
   .login-form input {
     min-width: 550px;
+    font-weight: 300;
   }
 }
 
@@ -463,9 +476,11 @@ footer {
   display: flex;
 }
 
+/* Cards also in game page */
 .photo-card-container {
   flex-wrap: wrap;
   gap: 1rem;
+  margin-block: 1rem;
 }
 
 /* Fixes last item grow in flex box */
@@ -514,8 +529,17 @@ footer {
 .photo-card__button:hover {
   padding-block: 0.5rem;
   border-radius: 5px;
-  background-color: var(--clr-red);
   padding-left: 40%;
+}
+
+.photo-card__button--delete:focus,
+.photo-card__button--delete:hover {
+  background-color: var(--clr-red);
+}
+
+.photo-card__button--like:focus,
+.photo-card__button--like:hover {
+  background-color: var(--clr-light-blue);
 }
 
 /* Medium screen */
@@ -554,13 +578,6 @@ footer {
   object-fit: cover;
   height: 100%;
   width: 100%;
-}
-
-.game_over {
-  margin: auto;
-  display: none;
-  z-index: 1;
-  position: relative;
 }
 
 .hidden_cards_conteiner {
