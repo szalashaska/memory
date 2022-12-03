@@ -1,0 +1,89 @@
+{% extends "layout.html" %} {% block title %} My account {% endblock%} {% block
+main %}
+
+<h1>Your TOP 10 scores:</h1>
+
+<table class="scores-table">
+  <thead class="scores-table__head">
+    <tr class="scores-table__head__row">
+      <th>Number</th>
+      <th>Score</th>
+      <th>Date</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for score in your_score %}
+    <tr class="scores-table__row">
+      <td>{{ loop.index }}</td>
+      <td>{{ score.score }}</td>
+      <td>{{ score.timestamp }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<!--The photos we like-->
+
+<h1>Your liked photos:</h1>
+
+{% for photo in your_photos %}
+<div class="col-12 col-sm-6 col-md-3">
+  <div class="card mb-4">
+    <div class="card-body">
+      <div class="card_fixed_hight">
+        <img
+          class="card-img-top liked_card"
+          id="picture{{ loop.index }}"
+          src="{{ photo.image }}"
+          alt="Pictures used in game"
+          class="image-fluid"
+        />
+      </div>
+      <div class="h-30">
+        <p class="card-text"><i class="bi bi-camera"></i> Author:</p>
+        <p class="card-text" id="author{{ loop.index }}">{{ photo.author }}</p>
+        <a href="{{ photo.url }}" id="link{{ loop.index }}" target="_blank"
+          ><p><i class="bi bi-link"></i>Link</p></a
+        >
+        <p
+          class="card-text"
+          id="like{{ loop.index }}"
+          style="cursor: pointer"
+          onclick="delete_photo(event)"
+        >
+          <i class="bi bi-x-circle"></i> Delete from liked photos
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+{% endfor %}
+<script
+  src="https://code.jquery.com/jquery-3.6.1.min.js"
+  integrity="sha256-o88AwQnZB+VDvE9tvIXrMQaPlFFSUTR+nldQm1LuPXQ="
+  crossorigin="anonymous"
+></script>
+<script>
+  function delete_photo(event) {
+    /* Get button and its id */
+    let button = event.srcElement;
+    let id = button.id;
+    id = id[4];
+
+    /* Get username */
+    let username = "{{ username }}";
+    let url = document.getElementById(`picture${id}`).src;
+
+    /* Post reqest to db */
+    $.post("/deletephoto", {
+      js_data: `{"image" : "${url}", "username" : "${username}"}`,
+    });
+
+    /* Refresh the page */
+    setTimeout(function () {
+      location.reload();
+    }, 500);
+  }
+</script>
+
+{% endblock %}

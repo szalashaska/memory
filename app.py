@@ -16,7 +16,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 load_dotenv(os.path.join(BASE_DIR, ".env"))
 
 # Choose between Postgres and Sqlite: "postgres" or "sqlite" 
-DB_TYPE = "postgres"
+DB_TYPE = "sqlite"
 
 # Choose between development and production: "dev" or "prod"
 ENV = "prod"
@@ -25,10 +25,13 @@ ENV = "prod"
 if DB_TYPE == "postgres":
     from flask_sqlalchemy import SQLAlchemy
     from sqlalchemy.pool import NullPool
+    print("postgres")
+
 else:
     import sqlite3
     # If we use Sqlite we do not need declare Username variable to avoid error
     Users = ""
+    print("sqlite")
 
 
 # Configure app
@@ -155,15 +158,11 @@ def getscores():
 def deletephoto():
     '''Deletes pictures from db'''
     # Data from js
-    jsdata = request.form["js_data"]
+    jsdata = request.get_json()
+    image = jsdata["image"]
+    username = jsdata["username"]
 
-    # Convert data to python dict
-    data = json.loads(jsdata)
-
-    image = data["image"]
-    username = data["username"]
-
-    # If we use Postgres
+# If we use Postgres
     if DB_TYPE == "postgres":
         db = SQLAlchemy(app)
 

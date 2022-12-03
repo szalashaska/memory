@@ -1,87 +1,108 @@
-{% extends "layout.html" %}
+{% extends "layout.html" %} {% block title %} My account {% endblock%}
+<!---->
+{% block script %}
+<script defer src="../static/scripts/myAccount.js"></script>
+{% endblock %}
 
-{% block title %}
-My account
-{% endblock%}
-
+<!---->
 {% block main %}
 
-<div class="container text-center my-2">
-    <h1> Your TOP 10 scores:</h1>
-</div>
-<div class="row justify-content-center text-center">
-    <div class="col-9">
-        <table class="table table-striped">
-            <thead>
-                <tr>
-                    <th>#</th>
-                    <th>Score</th>
-                    <th>Date</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for score in your_score %}
-                <tr>
-                    <td> {{ loop.index }} </td>
-                    <td> {{ score.score }} </td>
-                    <td> {{ score.timestamp }} </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
-</div>
+<h1>Your TOP 10 scores:</h1>
+
+<table class="scores-table">
+  <thead class="scores-table__head">
+    <tr class="scores-table__head__row">
+      <th>Number</th>
+      <th>Score</th>
+      <th>Date</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for score in your_score %}
+    <tr class="scores-table__row">
+      <td>{{ loop.index }}</td>
+      <td>{{ score.score }}</td>
+      <td>{{ score.timestamp }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
 
 <!--The photos we like-->
-<div class="conteiner text-center my-2">
-    <h1> Your liked photos:</h1>
-</div>
 
-<div class="conteiner" id="like_card_conteiner">
-    <div class="row">
-        {% for photo in your_photos %}
-        <div class="col-12 col-sm-6 col-md-3">
-            <div class="card mb-4">
-                <div class="card-body">
-                    <div class="card_fixed_hight">
-                        <img class="card-img-top liked_card" id="picture{{ loop.index }}" src="{{ photo.image }}" alt="Pictures used in game" class="image-fluid">
-                    </div>
-                    <div class="h-30">
-                        <p class="card-text"><i class="bi bi-camera"></i> Author:</p>
-                        <p class="card-text" id="author{{ loop.index }}">{{ photo.author }}</p>                       
-                        <a href="{{ photo.url }}" id="link{{ loop.index }}" target="_blank"><p><i class="bi bi-link"></i>Link</p></a>                        
-                        <p class="card-text" id="like{{ loop.index }}" style="cursor: pointer" onclick="delete_photo(event)"><i class="bi bi-x-circle"></i> Delete from liked photos</p>                        
-                    </div>      
-                </div>
-            </div>
-        </div>
-        {% endfor %}
+<h1>Your liked photos:</h1>
+
+<div class="photo-card-container">
+  {% for photo in your_photos %}
+  <div class="photo-card">
+    <img
+      class="photo-card__image"
+      src="{{ photo.image }}"
+      alt="Pictures used in game"
+    />
+    <div class="photo-card__icon-text">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="16"
+        height="16"
+        fill="currentColor"
+        class="bi bi-camera-video"
+        viewBox="0 0 16 16"
+      >
+        <path
+          fill-rule="evenodd"
+          d="M0 5a2 2 0 0 1 2-2h7.5a2 2 0 0 1 1.983 1.738l3.11-1.382A1 1 0 0 1 16
+             4.269v7.462a1 1 0 0 1-1.406.913l-3.111-1.382A2 2 0 0 1 9.5 13H2a2 2 0 0 1-2-2V5zm11.5
+              5.175 3.5 1.556V4.269l-3.5 1.556v4.35zM2 4a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h7.5a1 1 0 0 0 1-1V5a1 1 0 0 0-1-1H2z"
+        />
+      </svg>
+      <p>{{ photo.author }}</p>
     </div>
+
+    <a class="photo-card__icon-text" href="{{ photo.url }}" target="_blank">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="16"
+        height="16"
+        fill="currentColor"
+        class="bi bi-link-45deg"
+        viewBox="0 0 16 16"
+      >
+        <path
+          d="M4.715 6.542 3.343 7.914a3 3 0 1 0 4.243 4.243l1.828-1.829A3 3 0 0 0 8.586 5.5L8 6.086a1.002 1.002
+                 0 0 0-.154.199 2 2 0 0 1 .861 3.337L6.88 11.45a2 2 0 1 1-2.83-2.83l.793-.792a4.018 4.018 0 0 1-.128-1.287z"
+        />
+        <path
+          d="M6.586 4.672A3 3 0 0 0 7.414 9.5l.775-.776a2 2 0 0 1-.896-3.346L9.12 3.55a2 2 0 1 1
+                 2.83 2.83l-.793.792c.112.42.155.855.128 1.287l1.372-1.372a3 3 0 1 0-4.243-4.243L6.586 4.672z"
+        />
+      </svg>
+      <p>Link</p>
+    </a>
+
+    <button class="photo-card__icon-text photo-card__button" type="button">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="16"
+        height="16"
+        fill="currentColor"
+        class="bi bi-x-circle-fill"
+        viewBox="0 0 16 16"
+      >
+        <path
+          d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM5.354 4.646a.5.5 0 1 0-.708.708L7.293 8l-2.647 2.646a.5.5 0 0 0 .708.708L8 8.707l2.646 2.647a.5.5 0 0 0 .708-.708L8.707 8l2.647-2.646a.5.5 0 0 0-.708-.708L8 7.293 5.354 4.646z"
+        />
+      </svg>
+      Delete
+    </button>
+  </div>
+
+  {% endfor %}
 </div>
 
-<script>
-function delete_photo(event) {
-    /* Get button and its id */
-    let button = event.srcElement;
-    let id = button.id;
-    id = id[4];
-
-    /* Get username */
-    let username = '{{ username }}'
-    let url = document.getElementById(`picture${id}`).src
-
-    /* Post reqest to db */
-    $.post("/deletephoto", {
-        js_data: `{"image" : "${url}", "username" : "${username}"}`
-    }); 
-    
-    /* Refresh the page */
-    setTimeout( function() {
-        location.reload();
-    }, 500);    
-}
-        
+<!-- Variable passed to external js file -->
+<script type="text/javascript">
+  const user = "{{ username }}";
 </script>
-
 
 {% endblock %}

@@ -1,31 +1,26 @@
 {% extends "layout.html" %} {% block title %} Scores {% endblock%}
 <!---->
 {% block main %}
-<div class="container text-center my-2">
-  <h1>Our best players and their scores:</h1>
-</div>
 
-<div class="row justify-content-center text-center">
-  <div class="col-9">
-    <table class="table table-striped">
-      <thead>
-        <tr>
-          <th>#</th>
-          <th>Score</th>
-          <th>Name</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for score in top_scores %}
-        <tr>
-          <td>{{ loop.index }}</td>
-          <td>{{ score.score }}</td>
-          <td>{{ score.username | upper }}</td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-  </div>
-</div>
+<h1>Our Top 10 players and their scores:</h1>
+
+<table class="scores-table">
+  <thead class="scores-table__head">
+    <tr class="scores-table__head__row">
+      <th>Number</th>
+      <th>Score</th>
+      <th>Name</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for score in top_scores %}
+    <tr class="scores-table__row">
+      <td>{{ loop.index }}</td>
+      <td>{{ score.score }}</td>
+      <td>{{ score.username | upper }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
 
 {% endblock %}

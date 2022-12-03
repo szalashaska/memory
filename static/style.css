@@ -297,6 +297,10 @@ footer {
   flex-direction: column;
 }
 
+.pexel_footer {
+  height: 25px;
+}
+
 @media screen and (min-width: 900px) {
   nav {
     flex-direction: row;
@@ -335,6 +339,7 @@ footer {
 .logo {
   font-size: 1em;
   font-family: var(--font-special-big);
+  font-weight: 100;
 }
 
 .logo--yellow {
@@ -378,6 +383,139 @@ footer {
 .game-form input,
 .game-form select {
   width: 100%;
+}
+
+/* Login and register */
+
+.login-form {
+  margin: 1rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.login-form input {
+  min-width: 300px;
+}
+
+.login-text {
+  text-align: center;
+}
+
+@media screen and (min-width: 900px) {
+  .login-form input {
+    min-width: 550px;
+  }
+}
+
+/* Scores */
+
+.scores-table {
+  border-collapse: collapse;
+  width: 100%;
+  font-family: var(--font-normal);
+  margin-bottom: 1.5rem;
+}
+
+.scores-table__head {
+  font-family: var(--font-special);
+  font-size: 1.2rem;
+  text-align: left;
+}
+
+.scores-table__head__row th {
+  padding: 0.5rem;
+}
+
+.scores-table__row td {
+  padding: 0.5rem;
+  border-bottom: 1px black solid;
+  font-size: 0.8rem;
+}
+
+@media screen and (min-width: 900px) {
+  .scores-table__head {
+    font-size: 2rem;
+  }
+
+  .scores-table__row td {
+    font-size: 1.2rem;
+  }
+}
+
+@media screen and (min-width: 1650px) {
+  .scores-table__head {
+    font-size: 3.2rem;
+  }
+
+  .scores-table__row td {
+    font-size: 2rem;
+  }
+}
+
+/* My account */
+
+.photo-card__icon-text,
+.photo-card-container,
+.photo-card {
+  display: flex;
+}
+
+.photo-card-container {
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+/* Fixes last item grow in flex box */
+.photo-card-container::after {
+  content: "";
+  flex-grow: 100;
+}
+
+.photo-card {
+  padding: 1rem;
+  border-radius: 5px;
+  flex-direction: column;
+  gap: 0.5rem;
+  background-color: var(--clr-white);
+  flex-grow: 1;
+}
+
+.photo-card__image {
+  object-fit: cover;
+  width: 100%;
+  height: 16rem;
+}
+
+.photo-card__icon-text {
+  justify-content: flex-start;
+  align-items: center;
+  gap: 1rem;
+  color: var(--clr-black);
+  text-decoration: none;
+}
+
+.photo-card__icon-text p {
+  margin: 0;
+}
+
+.photo-card__button {
+  background: none;
+  font-family: var(--font-normal);
+  font-size: inherit;
+  padding-block: 0.5rem;
+  padding-inline: 0;
+  margin: 0;
+}
+
+.photo-card__button:focus,
+.photo-card__button:hover {
+  padding-block: 0.5rem;
+  border-radius: 5px;
+  background-color: var(--clr-red);
+  padding-left: 40%;
 }
 
 /* Medium screen */
@@ -427,18 +565,4 @@ footer {
 
 .hidden_cards_conteiner {
   display: none;
-}
-
-.card_fixed_hight {
-  height: 200px;
-}
-
-.liked_card {
-  object-fit: cover;
-  height: 100%;
-  width: 100%;
-}
-
-.pexel_footer {
-  height: 30px;
 }
