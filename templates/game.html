@@ -6,28 +6,28 @@
 <!-- -->
 {% block main %}
 
-<!--Score display-->
+<div class="play-game-container">
+  <h2>Score: <span id="score_output">0</span></h2>
 
-<h2>Score: <span id="score_output">0</span></h2>
+  <!--Game cards-->
+  <div class="game-cards-container">
+    {% for i in range(0, 2 * pairs) %}
 
-<!--Game cards-->
-<div class="game-cards-container">
-  {% for i in range(0, 2 * pairs) %}
+    <div class="card_frame">
+      <img
+        class="card_back"
+        id="{{ i }}"
+        src="../static/images/card_back.jpg"
+        alt="Back of a card"
+      />
+    </div>
 
-  <div class="card_frame">
-    <img
-      class="card_back"
-      id="{{ i }}"
-      src="../static/images/card_back.jpg"
-      alt="Back of a card"
-    />
+    {% endfor %}
   </div>
-
-  {% endfor %}
 </div>
 
 <!--After game is over screen-->
-<div class="game-over-container">
+<div class="game-over-container" style="display: none">
   <h1>
     Fantastic game, <span class="navbar-username"> {{ username }}! </span>
   </h1>
@@ -36,19 +36,19 @@
 
   <!--Buttons-->
 
-  <form action="/game" method="POST">
-    <input name="cards_quantity" value="{{ pairs * 2 }}" type="hidden" />
-    <input name="game_theme" value="{{ game_theme }}" type="hidden" />
-    <button type="submit">Try again!</button>
-  </form>
+  <div class="game-over-button-container">
+    <form action="/game" method="POST">
+      <input name="cards_quantity" value="{{ pairs * 2 }}" type="hidden" />
+      <input name="game_theme" value="{{ game_theme }}" type="hidden" />
+      <button type="submit">Try again!</button>
+    </form>
 
-  <a href="/specify" class="link-button"> Craft your game once more </a>
+    <a href="/specify" class="link-button"> Craft your game once more </a>
 
-  <a href="/" class="link-button"> Back to the homepage </a>
+    <a href="/scores" class="link-button"> Show Top Scores </a>
+  </div>
 
-  <a href="/scores" class="link-button"> Show Top Scores </a>
-
-  <button type="button">Show images</button>
+  <h3>Liked the images? Here they are once more:</h3>
 
   <!--Hidden cards-->
   <div class="photo-card-container" id="photo-container">
@@ -122,6 +122,8 @@
     </div>
     {% endfor %}
   </div>
-
-  {% endblock %}
 </div>
+<script type="text/javascript">
+  const pairs = "{{ pairs }}";
+</script>
+{% endblock %}

@@ -285,7 +285,7 @@ nav {
 
 .max-width-wrapper {
   margin-inline: auto;
-  padding: 2rem;
+  padding: 1rem;
   max-width: 1750px;
   min-height: calc(100vh - var(--height-footer) - var(--height-navbar));
 }
@@ -514,6 +514,11 @@ footer {
 
 .photo-card__icon-text p {
   margin: 0;
+  transition: color 0.3s ease;
+}
+
+.photo-card__icon-text p:hover {
+  color: var(--clr-light-blue);
 }
 
 .photo-card__button {
@@ -542,44 +547,88 @@ footer {
   background-color: var(--clr-light-blue);
 }
 
+/* Game */
+/* Game */
+/* Game */
+/* Game */
+.game-cards-container {
+  display: grid;
+  gap: 0.25rem;
+}
+
+.game-cards-container.pairs6 {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.game-cards-container.pairs12,
+.game-cards-container.pairs18 {
+  grid-template-columns: repeat(4, 1fr);
+}
+
+@media screen and (min-width: 700px) {
+  .game-cards-container {
+    gap: 0.5rem;
+  }
+  .game-cards-container.pairs6 {
+    grid-template-columns: repeat(4, 1fr);
+  }
+  .game-cards-container.pairs12,
+  .game-cards-container.pairs18 {
+    grid-template-columns: repeat(6, 1fr);
+  }
+}
+
+@media screen and (min-width: 1000px) {
+  .game-cards-container {
+    gap: 1rem;
+  }
+  .game-cards-container.pairs6 {
+    grid-template-columns: repeat(6, 1fr);
+  }
+
+  .game-cards-container.pairs12,
+  .game-cards-container.pairs18 {
+    grid-template-columns: repeat(8, 1fr);
+  }
+}
+
+@media screen and (min-width: 1400px) {
+  .game-cards-container.pairs18 {
+    grid-template-columns: repeat(12, 1fr);
+  }
+}
+
+.game-over-button-container {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: 0.5rem;
+}
+
+.game-over-button-container > * {
+  flex-grow: 1;
+}
+
+@media screen and (min-width: 700px) {
+  .game-over-button-container > * {
+    flex-grow: 0;
+  }
+}
+/* Medium screen */
+/* Medium screen */
+/* Medium screen */
 /* Medium screen */
 .card_frame {
-  width: 15vw;
-  height: 15vw;
   border-radius: 5px 15px;
-  border: solid 4px var(--clr-violet);
+  border: solid 3px var(--clr-violet);
   overflow: hidden;
   justify-content: center;
   align-items: center;
   transition: box-shadow 1s;
 }
 
-/* Big screen */
-@media (min-width: 768px) {
-  .card_frame {
-    width: 8vw;
-    height: 8vw;
-  }
-}
-
-/* Small screen */
-@media (max-width: 576px) {
-  .card_frame {
-    width: 30vw;
-    height: 30vw;
-  }
-}
-
-.card_frame:hover {
-  box-shadow: 0px 0px 40px 20px var(--clr-light-blue);
-}
-
 .card_back {
   object-fit: cover;
   height: 100%;
   width: 100%;
-}
-
-.hidden_cards_conteiner {
-  display: none;
 }
