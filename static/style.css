@@ -548,9 +548,8 @@ footer {
 }
 
 /* Game */
-/* Game */
-/* Game */
-/* Game */
+
+/* Container */
 .game-cards-container {
   display: grid;
   gap: 0.25rem;
@@ -558,11 +557,16 @@ footer {
 
 .game-cards-container.pairs6 {
   grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(4, 1fr);
 }
 
-.game-cards-container.pairs12,
+.game-cards-container.pairs12 {
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: repeat(6, 1fr);
+}
 .game-cards-container.pairs18 {
   grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: repeat(9, 1fr);
 }
 
 @media screen and (min-width: 700px) {
@@ -571,10 +575,15 @@ footer {
   }
   .game-cards-container.pairs6 {
     grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: repeat(3, 1fr);
   }
-  .game-cards-container.pairs12,
+  .game-cards-container.pairs12 {
+    grid-template-columns: repeat(6, 1fr);
+    grid-template-rows: repeat(4, 1fr);
+  }
   .game-cards-container.pairs18 {
     grid-template-columns: repeat(6, 1fr);
+    grid-template-rows: repeat(6, 1fr);
   }
 }
 
@@ -584,11 +593,17 @@ footer {
   }
   .game-cards-container.pairs6 {
     grid-template-columns: repeat(6, 1fr);
+    grid-template-rows: repeat(2, 1fr);
   }
 
-  .game-cards-container.pairs12,
+  .game-cards-container.pairs12 {
+    grid-template-columns: repeat(8, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+  }
+
   .game-cards-container.pairs18 {
     grid-template-columns: repeat(8, 1fr);
+    grid-template-rows: repeat(3, 1fr);
   }
 }
 
@@ -614,21 +629,72 @@ footer {
     flex-grow: 0;
   }
 }
-/* Medium screen */
-/* Medium screen */
-/* Medium screen */
-/* Medium screen */
-.card_frame {
+
+/* Game cards  */
+.game-card {
   border-radius: 5px 15px;
-  border: solid 3px var(--clr-violet);
+  border: solid 2px var(--clr-violet);
   overflow: hidden;
   justify-content: center;
   align-items: center;
-  transition: box-shadow 1s;
+  position: relative;
+  z-index: 1;
+  aspect-ratio: 1 / 1;
+  cursor: pointer;
 }
 
-.card_back {
+/* Image is hidden under game card  */
+.game-card::after {
+  --border-size: 2px;
+  content: "";
+  display: block;
+  position: absolute;
+  border-radius: 5px 15px;
+  border: solid var(--border-size) var(--clr-violet);
+  z-index: 5;
+  width: calc(100% + 2 * var(--border-size));
+  height: calc(100% + 2 * var(--border-size));
+  top: calc(-1 * var(--border-size));
+  left: calc(-1 * var(--border-size));
+  background-image: url("../static/images/card_back.jpg");
+  background-color: var(--clr-yellow);
+  background-size: cover;
+  transition: all 0.6s ease;
+}
+
+/* Flipped card */
+.game-card.flipped::after {
+  transform-origin: top left;
+  transform: rotate(90deg);
+}
+
+.game-card.flipped.no-match {
+  box-shadow: 0 0 10px var(--clr-red);
+  transition: box-shadow 0.6s ease;
+  animation: shake 0.5s;
+}
+
+.game-card__image {
   object-fit: cover;
   height: 100%;
   width: 100%;
+}
+
+@keyframes shake {
+  0% {
+    transform: rotate(0);
+  }
+  25% {
+    transform: rotate(5deg);
+  }
+
+  50% {
+    transform: rotate(-10deg);
+  }
+  75% {
+    transform: rotate(10deg);
+  }
+  100% {
+    transform: rotate(-5deg);
+  }
 }

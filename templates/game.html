@@ -9,15 +9,13 @@
 <div class="play-game-container">
   <h2>Score: <span id="score_output">0</span></h2>
 
-  <!--Game cards-->
   <div class="game-cards-container">
-    {% for i in range(0, 2 * pairs) %}
+    {% for photo in memory %}
 
-    <div class="card_frame">
+    <div class="game-card" id="card-{{ loop.index }}">
       <img
-        class="card_back"
-        id="{{ i }}"
-        src="../static/images/card_back.jpg"
+        class="game-card__image"
+        src="{{ photo.image }}"
         alt="Back of a card"
       />
     </div>
@@ -124,6 +122,6 @@
   </div>
 </div>
 <script type="text/javascript">
-  const pairs = "{{ pairs }}";
+  const pairsCount = "{{ pairs }}";
 </script>
 {% endblock %}
