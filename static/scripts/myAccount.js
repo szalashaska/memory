@@ -1,4 +1,4 @@
-// Because of Jinja syntax, const user must have been assigned in myaccount.html.
+// Because of Jinja syntax, "const user: string" must have been assigned in myaccount.html.
 
 // <script type="text/javascript">
 //   const user = "{{ username }}";

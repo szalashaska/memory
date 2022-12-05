@@ -6,119 +6,121 @@
 <!-- -->
 {% block main %}
 
-<div class="play-game-container">
-  <h2>Score: <span id="score_output">0</span></h2>
+<div class="game-wrapper">
+  <div class="play-game-container">
+    <h2 class="score-text">Score: <span id="score_output">0</span></h2>
 
-  <div class="game-cards-container">
-    {% for photo in memory %}
+    <div class="game-cards-container">
+      {% for photo in memory %}
 
-    <div class="game-card" id="card-{{ loop.index }}">
-      <img
-        class="game-card__image"
-        src="{{ photo.image }}"
-        alt="Back of a card"
-      />
-    </div>
-
-    {% endfor %}
-  </div>
-</div>
-
-<!--After game is over screen-->
-<div class="game-over-container" style="display: none">
-  <h1>
-    Fantastic game, <span class="navbar-username"> {{ username }}! </span>
-  </h1>
-
-  <h2>Your score was: <span id="final_score">0</span></h2>
-
-  <!--Buttons-->
-
-  <div class="game-over-button-container">
-    <form action="/game" method="POST">
-      <input name="cards_quantity" value="{{ pairs * 2 }}" type="hidden" />
-      <input name="game_theme" value="{{ game_theme }}" type="hidden" />
-      <button type="submit">Try again!</button>
-    </form>
-
-    <a href="/specify" class="link-button"> Craft your game once more </a>
-
-    <a href="/scores" class="link-button"> Show Top Scores </a>
-  </div>
-
-  <h3>Liked the images? Here they are once more:</h3>
-
-  <!--Hidden cards-->
-  <div class="photo-card-container" id="photo-container">
-    {% for photo in images %}
-    <div class="photo-card">
-      <img
-        class="photo-card__image"
-        src="{{ photo.image }}"
-        alt="Pictures used in game"
-      />
-      <div class="photo-card__icon-text">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="16"
-          height="16"
-          fill="currentColor"
-          class="bi bi-camera-video"
-          viewBox="0 0 16 16"
-        >
-          <path
-            fill-rule="evenodd"
-            d="M0 5a2 2 0 0 1 2-2h7.5a2 2 0 0 1 1.983 1.738l3.11-1.382A1 1 0 0 1 16
-               4.269v7.462a1 1 0 0 1-1.406.913l-3.111-1.382A2 2 0 0 1 9.5 13H2a2 2 0 0 1-2-2V5zm11.5
-                5.175 3.5 1.556V4.269l-3.5 1.556v4.35zM2 4a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h7.5a1 1 0 0 0 1-1V5a1 1 0 0 0-1-1H2z"
-          />
-        </svg>
-        <p>{{ photo.author }}</p>
+      <div class="game-card" id="card-{{ loop.index }}">
+        <img
+          class="game-card__image"
+          src="{{ photo.image }}"
+          alt="Back of a card"
+        />
       </div>
 
-      <a class="photo-card__icon-text" href="{{ photo.url }}" target="_blank">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="16"
-          height="16"
-          fill="currentColor"
-          class="bi bi-link-45deg"
-          viewBox="0 0 16 16"
-        >
-          <path
-            d="M4.715 6.542 3.343 7.914a3 3 0 1 0 4.243 4.243l1.828-1.829A3 3 0 0 0 8.586 5.5L8 6.086a1.002 1.002
-                   0 0 0-.154.199 2 2 0 0 1 .861 3.337L6.88 11.45a2 2 0 1 1-2.83-2.83l.793-.792a4.018 4.018 0 0 1-.128-1.287z"
-          />
-          <path
-            d="M6.586 4.672A3 3 0 0 0 7.414 9.5l.775-.776a2 2 0 0 1-.896-3.346L9.12 3.55a2 2 0 1 1
-                   2.83 2.83l-.793.792c.112.42.155.855.128 1.287l1.372-1.372a3 3 0 1 0-4.243-4.243L6.586 4.672z"
-          />
-        </svg>
-        <p>Link</p>
-      </a>
-      {% if session.user_id %}
-      <button
-        class="photo-card__icon-text photo-card__button photo-card__button--like"
-        type="button"
-      >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="16"
-          height="16"
-          fill="currentColor"
-          class="bi bi-heart-fill"
-          viewBox="0 0 16 16"
-        >
-          <path
-            fill-rule="evenodd"
-            d="M8 1.314C12.438-3.248 23.534 4.735 8 15-7.534 4.736 3.562-3.248 8 1.314z"
-          />
-        </svg>
-        Like
-      </button>
-      {% endif %}
+      {% endfor %}
     </div>
-    {% endfor %}
+  </div>
+
+  <!--After game is over screen-->
+  <div class="game-over-container">
+    <h1>
+      Fantastic game, <span class="navbar-username"> {{ username }}! </span>
+    </h1>
+
+    <h2>Your score was: <span id="final_score">0</span></h2>
+
+    <!--Buttons-->
+
+    <div class="game-over-button-container">
+      <form action="/game" method="POST">
+        <input name="cards_quantity" value="{{ pairs * 2 }}" type="hidden" />
+        <input name="game_theme" value="{{ game_theme }}" type="hidden" />
+        <button type="submit">Try again!</button>
+      </form>
+
+      <a href="/specify" class="link-button"> Craft your game once more </a>
+
+      <a href="/scores" class="link-button"> Show Top Scores </a>
+    </div>
+
+    <h3>Liked the images? Here they are once more:</h3>
+
+    <!--Hidden cards-->
+    <div class="photo-card-container" id="photo-container">
+      {% for photo in images %}
+      <div class="photo-card">
+        <img
+          class="photo-card__image"
+          src="{{ photo.image }}"
+          alt="Pictures used in game"
+        />
+        <div class="photo-card__icon-text">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            fill="currentColor"
+            class="bi bi-camera-video"
+            viewBox="0 0 16 16"
+          >
+            <path
+              fill-rule="evenodd"
+              d="M0 5a2 2 0 0 1 2-2h7.5a2 2 0 0 1 1.983 1.738l3.11-1.382A1 1 0 0 1 16
+               4.269v7.462a1 1 0 0 1-1.406.913l-3.111-1.382A2 2 0 0 1 9.5 13H2a2 2 0 0 1-2-2V5zm11.5
+                5.175 3.5 1.556V4.269l-3.5 1.556v4.35zM2 4a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h7.5a1 1 0 0 0 1-1V5a1 1 0 0 0-1-1H2z"
+            />
+          </svg>
+          <p>{{ photo.author }}</p>
+        </div>
+
+        <a class="photo-card__icon-text" href="{{ photo.url }}" target="_blank">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            fill="currentColor"
+            class="bi bi-link-45deg"
+            viewBox="0 0 16 16"
+          >
+            <path
+              d="M4.715 6.542 3.343 7.914a3 3 0 1 0 4.243 4.243l1.828-1.829A3 3 0 0 0 8.586 5.5L8 6.086a1.002 1.002
+                   0 0 0-.154.199 2 2 0 0 1 .861 3.337L6.88 11.45a2 2 0 1 1-2.83-2.83l.793-.792a4.018 4.018 0 0 1-.128-1.287z"
+            />
+            <path
+              d="M6.586 4.672A3 3 0 0 0 7.414 9.5l.775-.776a2 2 0 0 1-.896-3.346L9.12 3.55a2 2 0 1 1
+                   2.83 2.83l-.793.792c.112.42.155.855.128 1.287l1.372-1.372a3 3 0 1 0-4.243-4.243L6.586 4.672z"
+            />
+          </svg>
+          <p>Link</p>
+        </a>
+        {% if session.user_id %}
+        <button
+          class="photo-card__icon-text photo-card__button photo-card__button--like"
+          type="button"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            fill="currentColor"
+            class="bi bi-heart-fill"
+            viewBox="0 0 16 16"
+          >
+            <path
+              fill-rule="evenodd"
+              d="M8 1.314C12.438-3.248 23.534 4.735 8 15-7.534 4.736 3.562-3.248 8 1.314z"
+            />
+          </svg>
+          Like
+        </button>
+        {% endif %}
+      </div>
+      {% endfor %}
+    </div>
   </div>
 </div>
 <script type="text/javascript">
