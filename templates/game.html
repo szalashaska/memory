@@ -54,11 +54,12 @@
       {% for photo in images %}
       <div class="photo-card">
         <img
+          id="photo"
           class="photo-card__image"
           src="{{ photo.image }}"
           alt="Pictures used in game"
         />
-        <div class="photo-card__icon-text">
+        <div class="photo-card__icon-text" id="{{ photo.author }}">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="16"
@@ -125,5 +126,6 @@
 </div>
 <script type="text/javascript">
   const pairsCount = "{{ pairs }}";
+  const username = "{{ username }}";
 </script>
 {% endblock %}

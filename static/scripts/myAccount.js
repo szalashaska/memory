@@ -9,6 +9,7 @@ const deleteButtons = document.querySelectorAll(".photo-card__button");
 const handleDeletePhoto = async (e) => {
   // Get image link: button -> parrent div -> image
   const imageURL = e.target.parentNode.firstElementChild.src;
+  e.target.removeEventListener("click", handleDeletePhoto);
 
   // Prepare data; user is set in other file
   const data = {
@@ -19,11 +20,15 @@ const handleDeletePhoto = async (e) => {
     body: JSON.stringify({ image: imageURL, username: user }),
   };
 
-  const request = await fetch("/deletephoto", data);
-  const response = await request;
+  try {
+    const request = await fetch("/deletephoto", data);
+    const response = await request;
 
-  // Reload page
-  if (response.ok) location.reload();
+    // Reload page
+    if (response.ok) location.reload();
+  } catch (err) {
+    console.log(err);
+  }
 };
 
 deleteButtons.forEach((button) => {

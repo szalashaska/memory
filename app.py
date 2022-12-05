@@ -113,13 +113,9 @@ def getscores():
     '''Recives score after the game and saves it in the db'''
 
     # Data recived from javascript
-    jsdata = request.form["js_data"]
-
-    # Convert data from JSON dict to python dict
-    data = json.loads(jsdata)
-
-    score = data["score"]
-    username = data["username"]
+    jsdata = request.get_json()
+    score = jsdata["score"]
+    username = jsdata["username"]
 
     # If we use Postgres
     if DB_TYPE == "postgres":
@@ -162,9 +158,7 @@ def deletephoto():
     image = jsdata["image"]
     username = jsdata["username"]
 
-    print(image, username)
-
-# If we use Postgres
+    # If we use Postgres
     if DB_TYPE == "postgres":
         db = SQLAlchemy(app)
 
@@ -201,17 +195,12 @@ def deletephoto():
 @app.route("/getlikes", methods=["POST"])
 def getlikes():
     '''Recives liked photo link after the game and saves it in the db'''
-
     # Data recived from javascript
-    jsdata = request.form["js_data"]
-
-    # Convert data from JSON dict to python dict
-    data = json.loads(jsdata)
-
-    image = data["image"]
-    url = data["url"]
-    author = data["author"]
-    username = data["username"]
+    jsdata = request.get_json()
+    image = jsdata["image"]
+    url = jsdata["url"]
+    author = jsdata["author"]
+    username = jsdata["username"]
 
     # If we use "postgres"
     if DB_TYPE == "postgres":

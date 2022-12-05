@@ -563,7 +563,7 @@ footer {
   height: 0;
   opacity: 0;
   transform: scale(0);
-  transition: all 1s ease;
+  transition: all 0.5s ease;
 }
 
 .score-text {
@@ -738,6 +738,20 @@ footer {
   opacity: 1;
   transform: scale(1);
   height: 100%;
+}
+
+/* Liked card  */
+.photo-card.liked img {
+  opacity: 0.5;
+}
+
+.photo-card.liked button {
+  cursor: auto;
+  color: var(--clr-black);
+  padding-block: 0.5rem;
+  border-radius: 5px;
+  padding-left: 40%;
+  background-color: var(--clr-light-blue);
 }
 
 /* Animations */

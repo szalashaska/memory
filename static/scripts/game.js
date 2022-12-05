@@ -1,13 +1,15 @@
-// Because of Jinja syntax, "const pairs: string" must have been assigned in game.html.
-
+// Because of Jinja syntax, "const pairs: string" and "const username: string"
+// must have been assigned in game.html.
 // <script type="text/javascript">
 //   const pairs = "{{ pairs }}"
+//   const username = "{{ username }}";
 // </script>
 
 const playGameScreen = document.querySelector(".play-game-container");
 const gameCardContainer = document.querySelector(".game-cards-container");
 const gameOverContainer = document.querySelector(".game-over-container");
 const scoreOutput = document.getElementById("score_output");
+const likeButtons = document.querySelectorAll(".photo-card__button");
 let timeBonusBase = 10;
 
 let gameState = {
@@ -106,7 +108,26 @@ const handleScoreIncrement = () => {
   }, 500);
 };
 
-const recordUserScore = async () => {};
+const recordUserScore = async () => {
+  if (username === "Stranger") return;
+  const data = {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ score: gameState.score, username }),
+  };
+
+  try {
+    await fetch("/getscores", data);
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+const showFinalScore = () => {
+  document.getElementById("final_score").innerText = gameState.score;
+};
 
 const hidePlayGameScreen = () => {
   // Animate cards
@@ -145,6 +166,7 @@ const showGameOverScreen = () => {
 
 const handleGameOver = async () => {
   recordUserScore();
+  showFinalScore();
   await hidePlayGameScreen();
   showGameOverScreen();
 };
@@ -190,9 +212,44 @@ const handleClickOnCard = (e) => {
   }
 };
 
+const likeImage = async (image, url, author, username) => {
+  if (username === "Stranger") return;
+
+  const data = {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ image, url, author, username }),
+  };
+
+  try {
+    await fetch("/getlikes", data);
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+const handleLikeButtonClick = (e) => {
+  const likeButton = e.target;
+  const childArr = [...likeButton.parentNode.childNodes];
+  const [image] = childArr.filter((item) => item.nodeName === "IMG");
+  const [link] = childArr.filter((item) => item.nodeName === "A");
+  const [author] = childArr.filter((item) => item.nodeName === "DIV");
+
+  likeButton.removeEventListener("click", handleLikeButtonClick);
+  likeButton.parentNode.classList.add("liked");
+  likeButton.innerText = "Liked";
+
+  likeImage(image.src, link.href, author.id, username);
+};
+
 const init = () => {
   assignClassAccordingToPairs(pairsCount);
   gameCardContainer.addEventListener("click", handleClickOnCard);
+  likeButtons.forEach((button) => {
+    button.addEventListener("click", handleLikeButtonClick);
+  });
   calculateTimeBonusBase();
 };
 
