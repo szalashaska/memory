@@ -139,8 +139,8 @@ const hidePlayGameScreen = () => {
       const direction2 = Math.random() > 0.5 ? 1 : -1;
       // Push cards into random direction
       card.style.transform = `translate(${
-        (400 + 1000 * Math.random()) * direction1
-      }%, ${400 + 1000 * Math.random() * direction2}%)`;
+        (100 + 100 * Math.random()) * direction1
+      }vw, ${100 + 100 * Math.random() * direction2}vh)`;
     }, 500);
   });
 
@@ -153,7 +153,6 @@ const hidePlayGameScreen = () => {
   return new Promise((resolve, reject) => {
     setTimeout(() => {
       // Hide screen
-      playGameScreen.style.transform = "scale(0)";
       playGameScreen.style.display = "none";
       resolve();
     }, 1500);

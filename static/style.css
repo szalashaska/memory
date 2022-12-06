@@ -717,6 +717,7 @@ footer {
 }
 
 .game-card.game-over {
+  transition: all 2s;
   animation: shake 0.5s;
 }
 
