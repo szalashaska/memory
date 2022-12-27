@@ -1,7 +1,13 @@
 import os
+from dotenv import load_dotenv
+from pathlib import Path
 import requests
-from flask import Flask, redirect, request, json, render_template, session
+from flask import redirect, render_template, session
 from functools import wraps
+
+# Environment settings
+BASE_DIR = Path(__file__).resolve().parent.parent
+load_dotenv(os.path.join(BASE_DIR, ".env"))
 
 
 def get_images(query, quantity):
@@ -9,7 +15,7 @@ def get_images(query, quantity):
     
     # Contact API
     try:
-        api_key = "563492ad6f91700001000001eb0327b23e104114a74e566445718ba4"
+        api_key = os.getenv("API_KEY")
         url = f"https://api.pexels.com/v1/search?query={query}&per_page={quantity}"
         response = requests.get(url, headers = { 'Authorization': api_key })
         response.raise_for_status()
