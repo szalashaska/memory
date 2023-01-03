@@ -2,3 +2,4 @@ __pycache__
 commands.txt
 .env
 _env
+.vscode
