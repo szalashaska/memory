@@ -1,3 +1,5 @@
+![Design preview for Memory](./App.PNG)
+
 # Memory - card game webapp
 
 Simple web app - browser based game created with HTML, CSS, Python, Node.js and Sqlite or Postgres. By using "Pexels" API it lets you play card game, where you look for matching pairs.
@@ -121,7 +123,12 @@ Folder containing HTML templates.
 
 #### Setup
 
-To run this project, open its directory and run flask web server:
+1. Change ".env_YOUR_SETTINGS" name to ".env".
+
+2. Update variables. You need to register on Pexels developer website to get API key (for free).
+   [Pexels API link](https://www.pexels.com/api/)
+
+3. To run this project, open its directory and run flask web server.
 
 ```
 cd ../memory
