@@ -127,10 +127,13 @@ Folder containing HTML templates.
 
 2. Update variables. You need to register on Pexels developer website to get API key (for free).
    [Pexels API link](https://www.pexels.com/api/)
+   
+3. Install packages from requirements.txt.
 
-3. To run this project, open its directory and run flask web server.
+4. To run this project, open its directory and run flask web server.
 
 ```
-cd ../memory
+cd ./memory
+pip install -r requirements.txt
 python3 -m flask run
 ```
